@@ -1,0 +1,4 @@
+logging:
+  level:
+    org.hibernate.SQL: debug #JPA Hibernate가 생성하는 모든 SQL의 로그를 Logger를 이용해서 남김
+    org.hibernate.type: trace #SQL 쿼리 파라미터를 로그로 남김
