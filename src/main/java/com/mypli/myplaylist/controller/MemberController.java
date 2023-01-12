@@ -15,7 +15,7 @@ public class MemberController {
 
     @GetMapping("/")
     public String home(Model model) {
-        String i = "something changed";
+
         return "home";
     }
 }
