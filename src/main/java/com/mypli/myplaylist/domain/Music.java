@@ -40,6 +40,11 @@ public class Music {
     private Playlist playlist;
 
 
+    //==연관관계 메서드==//
+    public void setPlaylist(Playlist playlist) {
+        this.playlist = playlist;
+    }
+
     //==생성 메서드==//
     @Builder
     public Music(String title, String artist, String album, String url, Long order) {
@@ -49,5 +54,4 @@ public class Music {
         this.url = url;
         this.order = order;
     }
-
 }

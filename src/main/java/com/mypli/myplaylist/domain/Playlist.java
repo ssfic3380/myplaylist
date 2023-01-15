@@ -44,6 +44,16 @@ public class Playlist {
     private List<Music> musicList = new ArrayList<>();
 
 
+    //==연관관계 메서드==//
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+    public void addMusic(Music music) {
+        musicList.add(music);
+        music.setPlaylist(this);
+    }
+
     //==생성 메서드==//
     @Builder
     public Playlist(String playlistName, String playlistImg) {

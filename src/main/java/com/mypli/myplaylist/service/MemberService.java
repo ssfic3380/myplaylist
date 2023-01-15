@@ -1,13 +1,12 @@
 package com.mypli.myplaylist.service;
 
-import com.mypli.myplaylist.domain.Authority;
-import com.mypli.myplaylist.domain.Member;
-import com.mypli.myplaylist.domain.SocialCode;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -17,20 +16,25 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
+    //==조회==//
     /**
-     * 임시용
+     * 전체 회원 조회
      */
-    @Transactional
-    public Long join() {
-        Member member = Member.builder()
-                .authority(Authority.ROLE_USER)
-                .socialCode(SocialCode.GOOGLE)
-                .socialId("Google-abc123")
-                .socialAccessToken("a1b2c3d4e5f6g7")
-                .jwtRefreshToken("0z9y8x7w6p5v4u").build();
 
-        Member savedMember = memberRepository.save(member);
-        return savedMember.getId();
-    }
+    /**
+     * 이메일로 회원 1명 조회
+     */
 
+
+    //==변경==//
+    /**
+     * 회원 정보 변경(닉네임, 이메일)
+     * (*) 변경 감지를 활용해야 함
+     */
+    
+    
+    //==삭제==//
+    /**
+     * 회원 탈퇴
+     */
 }
