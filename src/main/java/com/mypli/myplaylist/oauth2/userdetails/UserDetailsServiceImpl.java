@@ -1,4 +1,4 @@
-package com.mypli.myplaylist.oauth2.user;
+package com.mypli.myplaylist.oauth2.userdetails;
 
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.repository.MemberRepository;

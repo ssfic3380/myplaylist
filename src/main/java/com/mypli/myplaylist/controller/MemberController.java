@@ -28,12 +28,6 @@ public class MemberController {
         model.addAttribute("provider", provider);
         model.addAttribute("oauthId", oauthId);
 
-        String acct = response.getHeader("Authorization").substring("Bearer ".length());
-        String reft = response.getHeader("refresh-token");
-
-        log.info("acct = {}", acct);
-        log.info("reft = {}", reft);
-
         return "social-success";
     }
 

@@ -1,8 +1,10 @@
 package com.mypli.myplaylist.config;
 
 import com.mypli.myplaylist.oauth2.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.mypli.myplaylist.oauth2.exception.JwtAccessDeniedHandler;
+import com.mypli.myplaylist.oauth2.exception.JwtAuthenticationEntryPoint;
 import com.mypli.myplaylist.oauth2.jwt.JwtAuthFilter;
-import com.mypli.myplaylist.oauth2.jwt.JwtTokenService;
+import com.mypli.myplaylist.oauth2.jwt.JwtTokenProvider;
 import com.mypli.myplaylist.oauth2.service.CustomOAuth2AuthService;
 import com.mypli.myplaylist.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import com.mypli.myplaylist.oauth2.handler.OAuth2AuthenticationSuccessHandler;
@@ -22,16 +24,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomOAuth2AuthService customOAuth2UserService;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
     private final CustomOidcUserService customOidcUserService;
+    private final CustomOAuth2AuthService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    private final JwtTokenService tokenService;
     private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
+
+    private final JwtTokenProvider tokenProvider;
 
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**", "/favicon.ico", "/h2-console/**");
     }
 
     @Bean
@@ -45,11 +56,15 @@ public class SecurityConfig {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authorizeRequests()
-                    //.antMatchers("/login", "/social").permitAll()
+                    //.antMatchers("/auth/**").permitAll()
                     //.anyRequest().authenticated()
                     .anyRequest().permitAll()
+//                .and()
+//                    .exceptionHandling()
+//                    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+//                    .accessDeniedHandler(jwtAccessDeniedHandler)
                 .and()
-                    .oauth2Login()//.loginPage("/token/expired")
+                    .oauth2Login()//.loginPage("")
                         .authorizationEndpoint()
                         .baseUri("/oauth2/authorization")
                         .authorizationRequestRepository(authorizationRequestRepository)
@@ -64,13 +79,9 @@ public class SecurityConfig {
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler);
 
-        http.addFilterBefore(new JwtAuthFilter(tokenService), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**", "/h2-console/**");
-    }
 }
