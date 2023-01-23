@@ -1,9 +1,12 @@
 package com.mypli.myplaylist.oauth2.jwt;
 
+import com.mypli.myplaylist.domain.Member;
+import com.mypli.myplaylist.oauth2.userdetails.UserDetailsImpl;
 import com.mypli.myplaylist.oauth2.userdetails.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -23,17 +27,19 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     private final Long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60L * 30L; //30분
     private final Long REFRESH_TOKEN_EXPIRE_TIME = 1000L * 60L * 60L * 24L * 15L; //15일
+    private final static long THREE_DAYS_MSEC = 259200000;
     private final String AUTHORITEIS_KEY = "role";
 
     private final Key key;
 
-    public JwtTokenProvider(@Value("${app.auth.secretKey}") String secretKey) {
+    public JwtTokenProvider(@Value("${app.auth.secretKey}") String secretKey, UserDetailsServiceImpl userDetailsService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.userDetailsService = userDetailsService;
     }
 
     public JwtToken generateToken(Authentication authentication) {
@@ -64,6 +70,35 @@ public class JwtTokenProvider {
                 .build();
     }
 
+    public JwtToken renewToken(String oldAccessToken, String refreshToken) {
+        long now = (new Date()).getTime();
+        long validTime = parseClaims(refreshToken).getExpiration().getTime() - now;
+
+        if (validTime <= THREE_DAYS_MSEC) { //RefreshToken 유효기간이 3일 이하면 갱신
+            refreshToken = Jwts.builder()
+                    .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                    .signWith(key, SignatureAlgorithm.HS512)
+                    .compact();
+        }
+
+        Claims claims = parseClaims(oldAccessToken);
+        String oauthId = claims.getSubject();
+        String authorities = (String) claims.get(AUTHORITEIS_KEY);
+
+        //AccessToken 생성
+        String accessToken = Jwts.builder()
+                .setSubject(oauthId)                                            //payload "sub": oauthId
+                .claim(AUTHORITEIS_KEY, authorities)                            //payload "role": "ROLE_USER"
+                .setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME))        //payload "exp": 1516239022 (예시)
+                .signWith(key, SignatureAlgorithm.HS512)                        //header "alg": "HS512"
+                .compact();
+
+        return JwtToken.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
     public Authentication getAuthentication(String accessToken) {
         //토큰 복호화
         Claims claims = parseClaims(accessToken);
@@ -79,7 +114,8 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         //UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject()); //TODO: 정상 작동하는지 확인 필요
+        UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
+        log.info("principle = {}", principal.getUsername());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
@@ -102,7 +138,7 @@ public class JwtTokenProvider {
         return false;
     }
 
-    private Claims parseClaims(String accessToken) {
+    public Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -112,6 +148,5 @@ public class JwtTokenProvider {
             return e.getClaims(); //만료됐더라도 정보를 꺼내기 위해서 return
         }
     }
-
 
 }

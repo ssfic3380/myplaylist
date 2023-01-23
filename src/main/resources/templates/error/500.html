@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/errorLayout}">
+<th:block layout:fragment="content">
+
+    <!-- Begin Page Content -->
+    <div id="notfound">
+        <div class="notfound">
+            <div class="notfound-404">
+                <h1>5<span>0</span>0</h1>
+            </div>
+            <p>Internal Server Error</p>
+            <a th:href="@{/home}">home page</a>
+        </div>
+    </div>
+
+</th:block>
+</html>

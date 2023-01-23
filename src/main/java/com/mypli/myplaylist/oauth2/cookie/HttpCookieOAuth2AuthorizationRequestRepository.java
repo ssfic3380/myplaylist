@@ -53,6 +53,6 @@ public class HttpCookieOAuth2AuthorizationRequestRepository implements Authoriza
     public void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {
         CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_NAME);
         CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
-        CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
+        //CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
     }
 }

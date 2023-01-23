@@ -33,8 +33,8 @@ public class Member {
     @NotNull @Size(max = 64)
     private String socialId;
 
-    /*@NotNull @Size(max = 255)
-    private String socialAccessToken;*/
+    @NotNull @Size(max = 255)
+    private String socialAccessToken;
 
     @NotNull @Size(max = 255)
     private String jwtRefreshToken;
@@ -64,12 +64,19 @@ public class Member {
         this.role = role;
         this.socialCode = socialCode;
         this.socialId = socialId;
-        //this.socialAccessToken = socialAccessToken;
+        this.socialAccessToken = socialAccessToken;
         this.jwtRefreshToken = jwtRefreshToken;
         this.memberProfile = memberProfile;
     }
 
     //==비즈니스 로직==//
+    /**
+     * Social Access Token 변경
+     */
+    public void updateSocialAccessToken(String socialAccessToken) {
+        this.socialAccessToken = socialAccessToken;
+    }
+
     /**
      * JWT Refresh Token 변경
      */

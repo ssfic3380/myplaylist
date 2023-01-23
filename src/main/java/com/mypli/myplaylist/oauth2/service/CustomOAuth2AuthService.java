@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -37,6 +38,7 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
         //1. 성공 정보를 바탕으로 Service 객체를 생성하고, 이로부터 OAuth2User 객체를 받아온다.
         OAuth2UserService delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(request);
+        OAuth2AccessToken accessToken = request.getAccessToken();
 
         //2. 받은 OAuth2User로부터 등록 ID(registration ID)와 PK(userNameAttributeName)를 뽑는다.
         /**
@@ -58,14 +60,12 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
         //log.info("attributes = {}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(attributes));
 
         //4. DB에 User 정보를 저장하거나, 바뀐 정보를 업데이트한다. (회원 가입)
-        Optional<Member> optionalMember = memberRepository.findBySocialId(attributes.getOauthId());
-        Member member;
-        if(optionalMember.isPresent()) {
-            member = optionalMember.get();
-            member = updateMember(member, attributes);
+        Member member = memberRepository.findBySocialId(attributes.getOauthId());
+        if(member != null) {
+            member = updateMember(member, attributes, accessToken);
         }
         else {
-            member = registerMember(attributes);
+            member = registerMember(attributes, accessToken);
         }
 
         //5. 권한을 ROLE_USER로 설정하고, SuccessHandler 혹은 FailureHandler가 사용할 수 있도록 등록한다.
@@ -76,15 +76,22 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
     }
 
     @Transactional
-    Member updateMember(Member member, OAuth2Attributes attributes) {
+    Member updateMember(Member member, OAuth2Attributes attributes, OAuth2AccessToken accessToken) {
+        //MemberProfile 업데이트
         MemberProfile memberProfile = member.getMemberProfile();
         memberProfile.updateProfile(attributes.getName(), attributes.getEmail(), attributes.getPicture());
+
+        //SocialAccessToken 업데이트
+        member.updateSocialAccessToken(accessToken.getTokenValue());
+
         return memberRepository.save(member);
     }
 
     @Transactional
-    Member registerMember(OAuth2Attributes attributes) {
+    Member registerMember(OAuth2Attributes attributes, OAuth2AccessToken accessToken) {
         Member member = attributes.toEntity();
+        member.updateSocialAccessToken(accessToken.getTokenValue());
+
         return memberRepository.save(member);
     }
 

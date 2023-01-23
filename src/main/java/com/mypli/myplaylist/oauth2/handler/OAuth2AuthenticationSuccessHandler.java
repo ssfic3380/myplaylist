@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         log.info("Authentication Success");
+        //SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String targetUrl = determineTargetUrl(request, response, authentication);
         log.info("targetUrl = {}", targetUrl);
@@ -62,7 +64,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Transactional
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
-        //1. 인증 시작 당시의 URI 획득
+        //1. 인증 시작 당시에 등록한 redirect URI 획득
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
@@ -77,7 +79,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         //3. Member 엔티티에 RefreshToken 입력
         String socialId = authentication.getName();
-        updateMemberRefreshToken(memberRepository.findBySocialId(socialId).get(), token.getRefreshToken());
+        updateMemberRefreshToken(memberRepository.findBySocialId(socialId), token.getRefreshToken());
 
         //4. Cookie에 RefreshToken 추가
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
@@ -102,17 +104,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private boolean isAuthorizedRedirectUri(String uri) {
         URI clientRedirectUri = URI.create(uri);
 
-        log.info("authorized redirect uris = {}", AUTHORIZED_REDIRECT_URIS);
-
         return AUTHORIZED_REDIRECT_URIS
                 .stream()
                 .anyMatch(uris -> {
-                    // Only validate host and port. Let the clients use different paths if they want to
+                    // host와 port만 검증한다. path는 클라이언트가 원하는 대로 정하도록 한다.
                     URI authorizedURI = URI.create(uris);
                     if (authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
                         && authorizedURI.getPort() == clientRedirectUri.getPort()) {
                         return true;
                     }
+                    log.info("authorized false");
                     return false;
                 });
     }

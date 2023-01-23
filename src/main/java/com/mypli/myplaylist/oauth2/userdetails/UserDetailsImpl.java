@@ -5,9 +5,11 @@ import com.mypli.myplaylist.domain.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 public class UserDetailsImpl implements UserDetails {
 
@@ -21,6 +23,9 @@ public class UserDetailsImpl implements UserDetails {
         this.member = member;
     }
 
+    /**
+     * UserDetails
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         ArrayList<GrantedAuthority> auth = new ArrayList<>();
@@ -30,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return "";
     }
 
     @Override
@@ -57,4 +62,5 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

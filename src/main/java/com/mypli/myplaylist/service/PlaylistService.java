@@ -16,12 +16,11 @@ public class PlaylistService {
 
     //==생성==//
     /**
-     * 플레이리스트 생성
-     */
-
-    /**
      * 유튜브에서 플레이리스트 가져오기
      */
+    public void createPlaylistFromYoutube() {
+
+    }
 
 
     //==조회==//

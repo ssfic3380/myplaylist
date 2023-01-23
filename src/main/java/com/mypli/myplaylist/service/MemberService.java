@@ -1,12 +1,13 @@
 package com.mypli.myplaylist.service;
 
+import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Random;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -22,9 +23,12 @@ public class MemberService {
      */
 
     /**
-     * 이메일로 회원 1명 조회
+     * socialId로 회원 1명 조회
      */
-
+    public Member findBySocialId(String socialId) {
+        Member member = memberRepository.findBySocialId(socialId);
+        return member;
+    }
 
     //==변경==//
     /**

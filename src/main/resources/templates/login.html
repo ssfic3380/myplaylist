@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/social-button.css}">
+</th:block>
+
+<th:block layout:fragment="script">
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="login-box">
+        <h2>로그인</h2>
+        <a href="#" class="social-button" id="google-connect"
+           th:href="@{http://localhost:8080/oauth2/authorization/google?redirect_uri=http://localhost:8080/oauth2/redirect}">
+            <span>Connect with Google</span></a>
+    </div>
+</th:block>
+
+</html>

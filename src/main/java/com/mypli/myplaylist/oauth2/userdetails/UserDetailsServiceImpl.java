@@ -16,8 +16,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findBySocialId(username)
-                .orElseThrow(() -> new UsernameNotFoundException("No Found Member: " + username));
+        Member member = memberRepository.findBySocialId(username);
+        if (member == null) throw new UsernameNotFoundException("No Found Member: " + username);
 
         UserDetailsImpl userDetails = new UserDetailsImpl();
         userDetails.setMember(member);

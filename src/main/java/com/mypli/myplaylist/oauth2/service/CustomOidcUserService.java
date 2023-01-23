@@ -52,10 +52,8 @@ public class CustomOidcUserService extends OidcUserService {
         OAuth2Attributes attributes = OAuth2Attributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         //4. DB에 User 정보를 저장하거나, 바뀐 정보를 업데이트한다. (회원 가입)
-        Optional<Member> optionalMember = memberRepository.findBySocialId(attributes.getOauthId());
-        Member member;
-        if(optionalMember.isPresent()) {
-            member = optionalMember.get();
+        Member member = memberRepository.findBySocialId(attributes.getOauthId());
+        if(member != null) {
             member = updateMember(member, attributes);
         }
         else {
