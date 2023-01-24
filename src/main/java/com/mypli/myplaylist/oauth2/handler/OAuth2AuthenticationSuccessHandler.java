@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +67,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Transactional
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
+//        OAuth2AccessToken accessTokenT = ((OAuth2LoginAuthenticationToken) authentication).getAccessToken();
+//        OAuth2RefreshToken refreshTokenT = ((OAuth2LoginAuthenticationToken) authentication).getRefreshToken();
+//        log.info("accessTokenT = {}", accessTokenT);
+//        log.info("refreshTokenT = {}", refreshTokenT);
+
         //1. 인증 시작 당시에 등록한 redirect URI 획득
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
@@ -85,7 +93,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtils.addCookie(response, REFRESH_TOKEN, token.getRefreshToken(), COOKIE_PERIOD);
 
-        //5. AccessToken과 함께 원래 있던 곳으로 redirect
+        //5. AccessToken과 함께 원래 있던 곳으로 redirect TODO: AccessToken을 Header로 전송? 생각좀 해봐야함
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token.getAccessToken())
                 .build().toUriString();

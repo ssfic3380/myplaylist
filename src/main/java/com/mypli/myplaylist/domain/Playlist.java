@@ -60,4 +60,20 @@ public class Playlist {
         this.playlistName = playlistName;
         this.playlistImg = playlistImg;
     }
+
+    //==비즈니스 로직==//
+    /**
+     * Playlist Name 변경
+     */
+    public void updatePlaylistName(String playlistName) {
+        this.playlistName = playlistName;
+    }
+
+    /**
+     * Playlist Image 변경
+     */
+    public void updatePlaylistImg(String playlistImg) {
+        this.playlistImg = playlistImg;
+    }
+
 }

@@ -114,8 +114,7 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         //UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
-        log.info("principle = {}", principal.getUsername());
+        UserDetailsImpl principal = userDetailsService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 

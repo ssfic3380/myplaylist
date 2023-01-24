@@ -35,8 +35,17 @@ public class MemberService {
      * 회원 정보 변경(닉네임, 이메일)
      * (*) 변경 감지를 활용해야 함
      */
-    
-    
+
+    /**
+     * JwtRefreshToken 변경
+     */
+    @Transactional
+    public void updateJwtRefreshToken(String socialId, String refreshToken) {
+        Member member = memberRepository.findBySocialId(socialId);
+        member.updateJwtRefreshToken(refreshToken);
+    }
+
+
     //==삭제==//
     /**
      * 회원 탈퇴

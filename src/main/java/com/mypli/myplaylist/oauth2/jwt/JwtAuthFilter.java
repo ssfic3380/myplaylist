@@ -37,7 +37,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         //1. Request Header의 "Authorization: Bearer "에서 Access Token을 꺼낸다.
         //String accessToken = HeaderUtils.getAccessToken(request);
-        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc0NTAzNzgxfQ.k62qblFOw0cdWnXIXF0dvr3x7WCGRVX51aYEN-lXT95P1A-2ce0pVkdVKtoptfJSgB8CpcoheE4G-lwFzxMM5Q";
+        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc0NTgwNzgxfQ.6dOR5wJ7B5Ot3PSMehzxO4aL7h59-PaYWX0Nu4UpPhYC3_X0u5uHtx1MhZrR5oFBtdHyJo-lD1kPmu9mtzgCew";
         String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
                 .orElse((null));
@@ -45,7 +45,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         log.info("Filter RefreshToken = {}", refreshToken);
 
         //2. Access Token의 유효성 검사를 하고, 정상 토큰이면 해당 토큰에서 Authenticaiton을 가져와서 SecurityContext에 저장한다.
-        if (StringUtils.hasText(accessToken)) {
+        if (StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("Filter Passed");
+        }
+
+        chain.doFilter(request, response);
+
+
+/*        if (StringUtils.hasText(accessToken)) {
 
             if (tokenProvider.validateToken(accessToken)) { //AccessToken 정상
                 Authentication authentication = tokenProvider.getAuthentication(accessToken);
@@ -63,6 +72,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         JwtToken newToken = tokenProvider.renewToken(accessToken, refreshToken); //accessToken 재발급, refreshToken 3일 이하시 재발급
                         accessToken = newToken.getAccessToken();
                         refreshToken = newToken.getRefreshToken();
+                        log.info("newAccessToken = {}", accessToken);
+                        log.info("newRefreshToken = {}", refreshToken);
 
                         //Header에 AccessToken 추가
                         HeaderUtils.setAccessToken(response, accessToken);
@@ -81,13 +92,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     }
                 }
             }
-        }
-
-        chain.doFilter(request, response);
+        }*/
 
     }
 
-    private boolean compareWithDB(String refreshToken, Member member) {
+/*    private boolean compareWithDB(String refreshToken, Member member) {
+        if (member == null) return false;
         return refreshToken.equals(member.getJwtRefreshToken());
     }
 
@@ -100,6 +110,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-    }
+    }*/
 
 }
