@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class YoutubePlaylistsDto {
 
-    private String id;
+    private String playlistId;
     private String title;
     private String thumbnail;
 
     @Builder
-    public YoutubePlaylistsDto(String id, String title, String thumbnail) {
-        this.id = id;
+    public YoutubePlaylistsDto(String playlistId, String title, String thumbnail) {
+        this.playlistId = playlistId;
         this.title = title;
         this.thumbnail = thumbnail;
     }

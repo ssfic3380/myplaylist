@@ -10,6 +10,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.*;
 import com.mypli.myplaylist.domain.Member;
+import com.mypli.myplaylist.dto.MusicDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemsDto;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class YoutubePlaylistItemsService {
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static YouTube youtube;
 
-    public List<YoutubePlaylistItemsDto> get(String socialId, String playlistId) {
+    public List<YoutubePlaylistItemsDto> getPlaylistItems(String socialId, String playlistId) {
 
         List<YoutubePlaylistItemsDto> youtubePlaylistItemsDtoList = new ArrayList<>();
 
@@ -49,12 +50,12 @@ public class YoutubePlaylistItemsService {
             Credential credential = new Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken);
 
             youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                    .setApplicationName("youtube-playlist-items-get").build();
+                    .setApplicationName("my-playlist").build();
 
             YouTube.PlaylistItems.List playlistItemsRequest = youtube.playlistItems().list("snippet");
             playlistItemsRequest.setPlaylistId(playlistId);
             playlistItemsRequest.setFields("nextPageToken," +
-                    "items(kind,snippet/title,snippet/videoOwnerChannelTitle,snippet/resourceId/videoId,snippet/thumbnails/default/url)");
+                    "items(snippet/title,snippet/videoOwnerChannelTitle,snippet/resourceId/videoId,snippet/thumbnails/default/url)");
 
             String nextToken = "";
             List<PlaylistItem> playlistItemList = new ArrayList<>();
@@ -82,33 +83,48 @@ public class YoutubePlaylistItemsService {
         return youtubePlaylistItemsDtoList;
     }
 
-    private void makeDtoList(Iterator<PlaylistItem> iteratorSearchResults, List<YoutubePlaylistItemsDto> youtubePlaylistItemsDtoList) {
+    private void makeDtoList(Iterator<PlaylistItem> iteratorPlaylistItems, List<YoutubePlaylistItemsDto> youtubePlaylistItemsDtoList) {
 
-        if (!iteratorSearchResults.hasNext()) log.error("검색 결과가 없습니다.");
+        if (!iteratorPlaylistItems.hasNext()) log.error("검색 결과가 없습니다.");
 
-        while (iteratorSearchResults.hasNext()) {
+        while (iteratorPlaylistItems.hasNext()) {
 
-            PlaylistItem singlePlaylistItem = iteratorSearchResults.next();
+            PlaylistItem singlePlaylistItem = iteratorPlaylistItems.next();
 
-            log.info("singlePlaylistItem = {}", singlePlaylistItem);
+            String title = singlePlaylistItem.getSnippet().getTitle();
+            String artist = (String) singlePlaylistItem.getSnippet().get("videoOwnerChannelTitle");
+            String videoId = singlePlaylistItem.getSnippet().getResourceId().getVideoId();
+            String thumbnail = singlePlaylistItem.getSnippet().getThumbnails().getDefault().getUrl();
 
-            if (singlePlaylistItem.getKind().equals("youtube#playlistItem")) {
-                String title = singlePlaylistItem.getSnippet().getTitle();
-                String artist = (String) singlePlaylistItem.getSnippet().get("videoOwnerChannelTitle");
-                String videoId = singlePlaylistItem.getSnippet().getResourceId().getVideoId();
-                String thumbnail = singlePlaylistItem.getSnippet().getThumbnails().getDefault().getUrl();
+            YoutubePlaylistItemsDto currentItem = YoutubePlaylistItemsDto.builder()
+                    .videoId(videoId)
+                    .title(title)
+                    .artist(artist)
+                    .thumbnail(thumbnail)
+                    .build();
 
-                YoutubePlaylistItemsDto currentItem = YoutubePlaylistItemsDto.builder()
-                        .title(title)
-                        .artist(artist)
-                        .videoId(videoId)
-                        .thumbnail(thumbnail)
-                        .build();
-
-                youtubePlaylistItemsDtoList.add(currentItem);
-
-            }
+            youtubePlaylistItemsDtoList.add(currentItem);
         }
+    }
+
+    public String insertPlaylistItem(String socialId, String playlistId, MusicDto musicDto) throws IOException{
+
+        ResourceId resourceId = new ResourceId();
+        resourceId.setKind("youtube#video");
+        resourceId.setVideoId(musicDto.getVideoId());
+
+        PlaylistItemSnippet playlistItemSnippet = new PlaylistItemSnippet();
+        playlistItemSnippet.setTitle(musicDto.getTitle());
+        playlistItemSnippet.setPlaylistId(playlistId);
+        playlistItemSnippet.setResourceId(resourceId);
+
+        PlaylistItem playlistItem = new PlaylistItem();
+        playlistItem.setSnippet(playlistItemSnippet);
+
+        YouTube.PlaylistItems.Insert playlistItemsInsertCommand = youtube.playlistItems().insert("snippet,contentDetails", playlistItem);
+        PlaylistItem returnedPlaylistItem = playlistItemsInsertCommand.execute();
+
+        return returnedPlaylistItem.getId();
     }
 
     /*public String get(String socialId, String playlistId, List<YoutubePlaylistItemsDto> youtubePlaylistItemsDtoList, String pageToken) {

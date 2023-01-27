@@ -2,8 +2,10 @@ package com.mypli.myplaylist.controller;
 
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistsDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemsDto;
+import com.mypli.myplaylist.dto.youtube.YoutubeSearchDto;
 import com.mypli.myplaylist.service.youtube.YoutubePlaylistItemsService;
 import com.mypli.myplaylist.service.youtube.YoutubePlaylistsService;
+import com.mypli.myplaylist.service.youtube.YoutubeSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +20,21 @@ public class YoutubeTestController {
 
     private final YoutubePlaylistsService youtubePlaylistService;
     private final YoutubePlaylistItemsService youtubePlaylistItemsService;
+    private final YoutubeSearchService youtubeSearchService;
 
     @GetMapping("youtube1")
     public List<YoutubePlaylistsDto> playlist_list() {
-        return youtubePlaylistService.get("111511732184187189491");
+        return youtubePlaylistService.getPlaylists("111511732184187189491");
     }
 
     @GetMapping("youtube2")
     public List<YoutubePlaylistItemsDto> playlistItems_list() {
-        return youtubePlaylistItemsService.get("111511732184187189491", "PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK");
+        return youtubePlaylistItemsService.getPlaylistItems("111511732184187189491", "PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK");
+    }
+
+    @GetMapping("youtube3")
+    public List<YoutubeSearchDto> search() {
+        return youtubeSearchService.getSearchResult("어떻게 이별까지 사랑하겠어");
     }
 
 }

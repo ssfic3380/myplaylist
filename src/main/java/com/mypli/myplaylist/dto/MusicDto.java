@@ -1,6 +1,5 @@
 package com.mypli.myplaylist.dto;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,14 +8,14 @@ import javax.validation.constraints.Size;
 
 @Getter
 @NoArgsConstructor
-public class PlaylistDto {
+public class MusicDto {
 
     @NotNull
-    private Long playlistId;
+    private Long musicId;
 
     @NotNull @Size(max = 128)
-    private String playlistName;
+    private String title;
 
-    @Size(max = 255)
-    private String playlistImg;
+    @NotNull @Size(max = 255)
+    private String videoId;
 }

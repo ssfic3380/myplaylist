@@ -10,8 +10,10 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.*;
 import com.mypli.myplaylist.domain.Member;
+import com.mypli.myplaylist.dto.PlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistsDto;
 import com.mypli.myplaylist.repository.MemberRepository;
+import com.mypli.myplaylist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class YoutubePlaylistsService {
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static YouTube youtube;
 
-    public List<YoutubePlaylistsDto> get(String socialId) {
+    public List<YoutubePlaylistsDto> getPlaylists(String socialId) {
 
         List<YoutubePlaylistsDto> youtubePlaylistsDtoList = new ArrayList<>();
 
@@ -49,12 +51,12 @@ public class YoutubePlaylistsService {
             Credential credential = new Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken);
 
             youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                    .setApplicationName("youtube-playlist-get").build();
+                    .setApplicationName("my-playlist").build();
 
             YouTube.Playlists.List playlistsRequest = youtube.playlists().list("snippet");
             playlistsRequest.setMine(true);
             playlistsRequest.setFields("nextPageToken," +
-                    "items(kind,id,snippet/title,snippet/thumbnails/default/url)");
+                    "items(id,snippet/title,snippet/thumbnails/default/url)");
 
             String nextToken = "";
             List<Playlist> playlistsList = new ArrayList<>();
@@ -82,30 +84,45 @@ public class YoutubePlaylistsService {
         return youtubePlaylistsDtoList;
     }
 
-    private void makeDtoList(Iterator<Playlist> iteratorSearchResults, List<YoutubePlaylistsDto> youtubePlaylistsDtoList) {
+    private void makeDtoList(Iterator<Playlist> iteratorPlaylists, List<YoutubePlaylistsDto> youtubePlaylistsDtoList) {
 
-        if (!iteratorSearchResults.hasNext()) log.error("검색 결과가 없습니다.");
+        if (!iteratorPlaylists.hasNext()) log.error("검색 결과가 없습니다.");
 
-        while (iteratorSearchResults.hasNext()) {
+        while (iteratorPlaylists.hasNext()) {
 
-            Playlist singlePlaylist = iteratorSearchResults.next();
+            Playlist singlePlaylist = iteratorPlaylists.next();
 
-            log.info("singlePlaylist = {}", singlePlaylist);
+            String playlistId = singlePlaylist.getId();
+            String title = singlePlaylist.getSnippet().getTitle();
+            String thumbnail = singlePlaylist.getSnippet().getThumbnails().getDefault().getUrl();
 
-            if (singlePlaylist.getKind().equals("youtube#playlist")) {
-                String id = singlePlaylist.getId();
-                String title = singlePlaylist.getSnippet().getTitle();
-                String thumbnail = singlePlaylist.getSnippet().getThumbnails().getDefault().getUrl();
+            YoutubePlaylistsDto currentItem = YoutubePlaylistsDto.builder()
+                    .playlistId(playlistId)
+                    .title(title)
+                    .thumbnail(thumbnail)
+                    .build();
 
-                YoutubePlaylistsDto currentItem = YoutubePlaylistsDto.builder()
-                        .id(id)
-                        .title(title)
-                        .thumbnail(thumbnail)
-                        .build();
-
-                youtubePlaylistsDtoList.add(currentItem);
-            }
+            youtubePlaylistsDtoList.add(currentItem);
         }
+    }
+
+    public String insertPlaylist(String socialId, PlaylistDto playlistDto) throws IOException {
+
+        PlaylistSnippet playlistSnippet = new PlaylistSnippet();
+        playlistSnippet.setTitle(playlistDto.getPlaylistName());
+        playlistSnippet.setDescription("마플리(My Playlist)에서 만든 플레이리스트");
+
+        PlaylistStatus playlistStatus = new PlaylistStatus();
+        playlistStatus.setPrivacyStatus("private");
+
+        Playlist youtubePlaylist = new Playlist();
+        youtubePlaylist.setSnippet(playlistSnippet);
+        youtubePlaylist.setStatus(playlistStatus);
+
+        YouTube.Playlists.Insert playlistInsertCommand = youtube.playlists().insert("snippet,status", youtubePlaylist);
+        Playlist playlistInserted = playlistInsertCommand.execute();
+
+        return playlistInserted.getId();
     }
 
     /*public String get(String socialId, List<YoutubePlaylistDto> youtubePlaylistDtoList, String pageToken) {
