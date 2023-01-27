@@ -11,6 +11,7 @@ import com.mypli.myplaylist.oauth2.handler.OAuth2AuthenticationSuccessHandler;
 import com.mypli.myplaylist.oauth2.service.CustomOidcUserService;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,7 +51,9 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**", "/favicon.ico", "/h2-console/**");
+        return web -> web.ignoring()
+                .antMatchers("/images/**", "/js/**", "/webjars/**", "/favicon.ico", "/h2-console/**")
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     /**
@@ -59,7 +62,7 @@ public class SecurityConfig {
      *                                   => 공격대상: 서버 (권한 남용)
      *                                   => Rest Api는 non-browser client만을 위한 서비스이기 때문에 CSRF 공격으로부터 안전해서 비활성화해도 됨
      *
-     * XSS(Cross Site Scripting): 권한의 없는 사용자가 공격하려는 사이트에 스크립트를 삽입하는 기법
+     * XSS(Cross Site Scripting): 권한이 없는 사용자가 공격하려는 사이트에 스크립트를 삽입하는 기법
      *                            웹 애플리케이션이 사용자로부터 입력 받은 값을 제대로 검사하지 않고 사용할 때 나타나고,
      *                            공격에 성공하면 사이트에 접속한 사용자는 삽입된 코드를 실행해서, 의도치 않은 행동을 수행시키거나 쿠키나 세션 등의 민감한 정보를 탈취한다.
      *                            => 공격대상: 클라이언트 (쿠키/세션 갈취, 웹사이트 변조 등)
@@ -86,9 +89,9 @@ public class SecurityConfig {
                 .and()
                     .authorizeRequests()
                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                    .antMatchers("/oauth2/**").permitAll()
-                    .anyRequest().authenticated()
-//                    .anyRequest().permitAll()
+//                    .antMatchers("/oauth2/**", "/home").permitAll()
+//                    .anyRequest().authenticated()
+                    .anyRequest().permitAll()
                 .and()
                     .oauth2Login()//.loginPage("")
                     .authorizationEndpoint()

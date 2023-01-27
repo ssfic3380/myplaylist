@@ -16,10 +16,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        //유효한 자격증명을 제공하지 않고(로그인(인증) 없이) 접근하려 하면 401
-        log.error("Responding with unauthorized error.", authException);
-        response.sendError(
+        //유효한 자격증명을 제공하지 않고(로그인(인증) 없이) 접근하려 하면 401  ==> 로그인 페이지로 redirect로 수정
+        
+        //log.error("Responding with unauthorized error.", authException);
+        /*response.sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
-                authException.getLocalizedMessage());
+                authException.getLocalizedMessage());*/
+
+        log.error("Responding with unauthorized error");
+        response.sendRedirect("/oauth2/login");
     }
 }

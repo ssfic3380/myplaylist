@@ -44,22 +44,14 @@ public class AuthController {
     }
 
     @GetMapping("/redirect")
-    public String oauth2Redirect(@RequestParam("token") String jwtAccessToken,
-                                 RedirectAttributes redirectAttributes) {
+    public String oauth2Redirect(@RequestParam String token, RedirectAttributes redirectAttributes) {
 
-        String socialId = SecurityUtils.getCurrentMemberId();
-        log.info("socialId = {}", socialId);
+        //TODO: oauth2 인증 성공했으면 SecurityContext 안에 있을 것 같은데 없음; (JwtFilter에서 setAuthentication 해주는거 아니면 안됨)
+//        String socialId = SecurityUtils.getCurrentMemberId();
+//        log.info("socialId = {}", socialId);
 
-        Member member = memberService.findBySocialId(socialId);
-        String socialAccessToken = member.getSocialAccessToken();
-
-        /**
-         * TODO: 여기서 accessToken 2개를 어떻게든 저장하고 redirectAttribute 없이 home으로 redirect 시키자
-         */
-        //이거는 테스트용
-        redirectAttributes.addAttribute("socialAccessToken", socialAccessToken);
-        redirectAttributes.addAttribute("jwtAccessToken", jwtAccessToken);
-        return "redirect:/home?jwtAccessToken={jwtAccessToken}&socialAccessToken={socialAccessToken}";
+        redirectAttributes.addFlashAttribute("token", token);
+        return "redirect:/home";
     }
 
     @GetMapping("/refresh")

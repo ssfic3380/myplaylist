@@ -6,6 +6,7 @@ import com.mypli.myplaylist.oauth2.jwt.JwtToken;
 import com.mypli.myplaylist.oauth2.jwt.JwtTokenProvider;
 import com.mypli.myplaylist.repository.MemberRepository;
 import com.mypli.myplaylist.utils.CookieUtils;
+import com.mypli.myplaylist.utils.HeaderUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Value("${app.oauth2.authorizedRedirectUris}")
     private final ArrayList<String> AUTHORIZED_REDIRECT_URIS;
     private final String REFRESH_TOKEN = "refresh-token";
+    private final String SOCIAL_ACCESS_TOKEN = "social-access-token";
     private final int COOKIE_PERIOD = 60 * 60 * 24; //하루
 
     @Transactional
@@ -49,7 +51,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         log.info("Authentication Success");
-        //SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String targetUrl = determineTargetUrl(request, response, authentication);
         log.info("targetUrl = {}", targetUrl);
@@ -87,13 +88,18 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         //3. Member 엔티티에 RefreshToken 입력
         String socialId = authentication.getName();
-        updateMemberRefreshToken(memberRepository.findBySocialId(socialId), token.getRefreshToken());
+        Member member = memberRepository.findBySocialId(socialId);
+        updateMemberRefreshToken(member, token.getRefreshToken());
 
         //4. Cookie에 RefreshToken 추가
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtils.addCookie(response, REFRESH_TOKEN, token.getRefreshToken(), COOKIE_PERIOD);
 
-        //5. AccessToken과 함께 원래 있던 곳으로 redirect TODO: AccessToken을 Header로 전송? 생각좀 해봐야함
+        //4-1(임시). Cookie에 SocialAccessToken 추가 (AccessToken은 그냥 파라미터로 전달: header에 넣어봤자 redirect라서 없어지는듯)
+        CookieUtils.deleteCookie(request, response, SOCIAL_ACCESS_TOKEN);
+        CookieUtils.addCookie(response, SOCIAL_ACCESS_TOKEN, member.getSocialAccessToken(), COOKIE_PERIOD);
+
+        //5. AccessToken과 함께 원래 있던 곳으로 redirect
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token.getAccessToken())
                 .build().toUriString();

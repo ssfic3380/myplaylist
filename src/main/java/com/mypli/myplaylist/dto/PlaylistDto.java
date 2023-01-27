@@ -1,4 +1,4 @@
-package com.mypli.myplaylist.controller.dto;
+package com.mypli.myplaylist.dto;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;

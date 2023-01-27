@@ -1,13 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-    <head>
-        <meta charset="UTF-8">
-        <title>Social Login Success</title>
-    </head>
-    <body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<th:block layout:fragment="css">
+    <link rel="stylesheet" th:href="@{/css/social-button.css}">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+    </script>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="main">
         <h1>소셜 로그인 성공</h1>
         socialAccessToken: <h2 th:text="${socialAccessToken}"> 소셜액세스 </h2>
         jwtAccessToken: <h2 th:text="${jwtAccessToken}"> jwt액세스 </h2>
         refreshToken: <h2 th:text="${refreshToken}"> 리프레쉬 </h2>
-    </body>
+    </div>
+</th:block>
+
 </html>

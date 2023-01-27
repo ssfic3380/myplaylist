@@ -31,6 +31,9 @@ public class Music {
     @NotNull @Size(max = 255)
     private String videoId;
 
+    @Size(max = 255)
+    private String musicImg;
+
     @NotNull
     private Long order; //플레이리스트에서의 출력 순서 정보
 
@@ -47,11 +50,12 @@ public class Music {
 
     //==생성 메서드==//
     @Builder
-    public Music(String title, String artist, String album, String videoId, Long order) {
+    public Music(String title, String artist, String album, String videoId, String musicImg, Long order) {
         this.title = title;
         this.artist = artist;
         this.album = album;
         this.videoId = videoId;
+        this.musicImg = musicImg;
         this.order = order;
     }
 }

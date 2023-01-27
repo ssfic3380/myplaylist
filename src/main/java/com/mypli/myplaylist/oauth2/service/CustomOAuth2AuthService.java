@@ -34,7 +34,7 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
 
-        //1. 성공 정보를 바탕으로 Service 객체를 생성하고, 이로부터 OAuth2User 객체를 받아온다.
+        //1. 성공 정보를 바탕으로 Service 객체를 생성하고, 이로부터 OAuth2User 객체를 받아오고, Access Token도 가져온다.
         OAuth2UserService delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(request);
         OAuth2AccessToken accessToken = request.getAccessToken();
