@@ -41,13 +41,18 @@ public class YoutubePlaylistItemsService {
 
             Member member = memberRepository.findBySocialId(socialId);
             String accessToken = "";
-            if(member != null) accessToken = member.getSocialAccessToken();
-            else {
+            String refreshToken = "";
+            if(member != null) {
+                accessToken = member.getSocialAccessToken();
+                refreshToken = member.getSocialRefreshToken();
+            } else {
                 log.error("Cannot find member from JwtAccessToken");
                 return youtubePlaylistItemsDtoList;
             }
 
-            Credential credential = new Credential(BearerToken.authorizationHeaderAccessMethod()).setAccessToken(accessToken);
+            Credential credential = new Credential(BearerToken.authorizationHeaderAccessMethod())
+                    .setAccessToken(accessToken)
+                    .setRefreshToken(refreshToken);
 
             youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                     .setApplicationName("my-playlist").build();

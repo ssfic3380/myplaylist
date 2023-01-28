@@ -1,10 +1,13 @@
 package com.mypli.myplaylist.config;
 
+import com.mypli.myplaylist.oauth2.converter.CustomRequestEntityConverter;
+import com.mypli.myplaylist.oauth2.converter.CustomTokenResponseConverter;
 import com.mypli.myplaylist.oauth2.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.mypli.myplaylist.oauth2.handler.JwtAccessDeniedHandler;
 import com.mypli.myplaylist.oauth2.exception.JwtAuthenticationEntryPoint;
 import com.mypli.myplaylist.oauth2.jwt.JwtAuthFilter;
 import com.mypli.myplaylist.oauth2.jwt.JwtTokenProvider;
+import com.mypli.myplaylist.oauth2.resolver.CustomAuthorizationRequestResolver;
 import com.mypli.myplaylist.oauth2.service.CustomOAuth2AuthService;
 import com.mypli.myplaylist.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import com.mypli.myplaylist.oauth2.handler.OAuth2AuthenticationSuccessHandler;
@@ -14,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,8 +25,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
@@ -35,11 +46,12 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
     private final CustomOidcUserService customOidcUserService;
     private final CustomOAuth2AuthService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
     private final JwtTokenProvider tokenProvider;
     private final MemberRepository memberRepository;
@@ -93,10 +105,14 @@ public class SecurityConfig {
 //                    .anyRequest().authenticated()
                     .anyRequest().permitAll()
                 .and()
-                    .oauth2Login()//.loginPage("")
+                    .oauth2Login()
                     .authorizationEndpoint()
-                    .baseUri("/oauth2/authorization") //클라이언트가 로그인 페이지로 이동하기 위해 사용할 URI
+                    .authorizationRequestResolver(new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization")) //OAuth2 인증을 요청할 때, 매개 변수 추가(구글 refreshToken을 위함)
+                    //.baseUri("/oauth2/authorization") //클라이언트가 로그인 페이지로 이동하기 위해 사용할 URI
                     .authorizationRequestRepository(authorizationRequestRepository) //사이트 로그인 이후 리다이렉션할 URI를 저장하고 있는 저장소 (?redirect_uri= 의 값을 가지고 있음)
+                .and()
+                    .tokenEndpoint()
+                    .accessTokenResponseClient(customAccessTokenResponseClient()) //토큰 요청, 응답 내용을 재정의
                 .and()
                     .redirectionEndpoint()
                     .baseUri("/*/oauth2/code/*") //클라이언트가 로그인을 성공하면 인가 코드를 받아올 URI
@@ -114,7 +130,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));                          //자원을 공유할 오리진(출처) 지정
@@ -126,6 +143,24 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);                       //CORS를 적용할 URL 패턴
         return source;
+    }
+
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> customAccessTokenResponseClient() {
+
+        //토큰 요청을 사용자 정의
+        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+        accessTokenResponseClient.setRequestEntityConverter(new CustomRequestEntityConverter());
+
+        //토큰 응답 처리를 사용자 정의
+        OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter = new OAuth2AccessTokenResponseHttpMessageConverter();
+        tokenResponseHttpMessageConverter.setTokenResponseConverter(new CustomTokenResponseConverter());
+        RestTemplate restTemplate = new RestTemplate(Arrays.asList(new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
+        restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+
+        accessTokenResponseClient.setRestOperations(restTemplate);
+
+        return accessTokenResponseClient;
     }
 
 }

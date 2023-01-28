@@ -37,6 +37,9 @@ public class Member {
     private String socialAccessToken;
 
     @NotNull @Size(max = 255)
+    private String socialRefreshToken;
+
+    @NotNull @Size(max = 255)
     private String jwtRefreshToken;
 
     //==연관관계==//
@@ -60,11 +63,12 @@ public class Member {
 
     //==생성 메서드==//
     @Builder
-    public Member(Role role, SocialCode socialCode, String socialId, String socialAccessToken, String jwtRefreshToken, MemberProfile memberProfile) {
+    public Member(Role role, SocialCode socialCode, String socialId, String socialAccessToken, String socialRefreshToken, String jwtRefreshToken, MemberProfile memberProfile) {
         this.role = role;
         this.socialCode = socialCode;
         this.socialId = socialId;
         this.socialAccessToken = socialAccessToken;
+        this.socialRefreshToken = socialRefreshToken;
         this.jwtRefreshToken = jwtRefreshToken;
         this.memberProfile = memberProfile;
     }
@@ -75,6 +79,13 @@ public class Member {
      */
     public void updateSocialAccessToken(String socialAccessToken) {
         this.socialAccessToken = socialAccessToken;
+    }
+
+    /**
+     * Social Refresh Token 변경
+     */
+    public void updateSocialRefreshToken(String socialRefreshToken) {
+        this.socialRefreshToken = socialRefreshToken;
     }
 
     /**

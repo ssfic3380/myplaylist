@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl implements UserDetails, OAuth2User {
 
     private Member member;
+    private Map<String, Object> attributes;
 
     public Member getMember() {
         return this.member;
@@ -21,6 +22,23 @@ public class UserDetailsImpl implements UserDetails {
 
     public void setMember(Member member) {
         this.member = member;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
+    /**
+     * OAuth2User
+     */
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getName() {
+        return member.getSocialId();
     }
 
     /**
@@ -62,5 +80,4 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }

@@ -4,6 +4,7 @@ import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.oauth2.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.mypli.myplaylist.oauth2.jwt.JwtToken;
 import com.mypli.myplaylist.oauth2.jwt.JwtTokenProvider;
+import com.mypli.myplaylist.oauth2.userdetails.UserDetailsImpl;
 import com.mypli.myplaylist.repository.MemberRepository;
 import com.mypli.myplaylist.utils.CookieUtils;
 import com.mypli.myplaylist.utils.HeaderUtils;
@@ -12,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
@@ -67,11 +70,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Transactional
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-
-//        OAuth2AccessToken accessTokenT = ((OAuth2LoginAuthenticationToken) authentication).getAccessToken();
-//        OAuth2RefreshToken refreshTokenT = ((OAuth2LoginAuthenticationToken) authentication).getRefreshToken();
-//        log.info("accessTokenT = {}", accessTokenT);
-//        log.info("refreshTokenT = {}", refreshTokenT);
 
         //1. 인증 시작 당시에 등록한 redirect URI 획득
         Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)

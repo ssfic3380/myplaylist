@@ -105,6 +105,7 @@ public class OAuth2Attributes {
                 .socialCode(SocialCode.valueOf(provider.name()))
                 .socialId(oauthId)
                 .socialAccessToken("new member")
+                .socialRefreshToken("new member")
                 .jwtRefreshToken("new member")
                 .build();
 
