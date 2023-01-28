@@ -6,6 +6,7 @@ import com.mypli.myplaylist.utils.HeaderUtils;
 import com.mypli.myplaylist.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -42,7 +43,7 @@ public class HomeController {
 
         String jwtAccessToken = "";
         Map<String, ?> flashMap = RequestContextUtils.getInputFlashMap(request);
-        if(!flashMap.isEmpty()) jwtAccessToken = (String) flashMap.get("token");
+        if(flashMap != null) jwtAccessToken = (String) flashMap.get("token");
 
         String refreshToken = CookieUtils.getCookie(request, "refresh-token")
                         .map(cookie -> cookie.getValue())

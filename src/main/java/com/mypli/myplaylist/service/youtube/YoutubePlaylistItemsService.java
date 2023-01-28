@@ -1,6 +1,7 @@
 package com.mypli.myplaylist.service.youtube;
 
 import com.google.api.client.auth.oauth2.BearerToken;
+import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -15,6 +16,7 @@ import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemsDto;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -33,6 +35,10 @@ public class YoutubePlaylistItemsService {
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static YouTube youtube;
 
+    @Value("${app.youtube.clientId}") private String CLIENT_ID;
+    @Value("${app.youtube.clientSecret}") private String CLIENT_SECRET;
+    @Value("${app.youtube.tokenUri}") private String TOKEN_URI;
+
     public List<YoutubePlaylistItemsDto> getPlaylistItems(String socialId, String playlistId) {
 
         List<YoutubePlaylistItemsDto> youtubePlaylistItemsDtoList = new ArrayList<>();
@@ -42,7 +48,7 @@ public class YoutubePlaylistItemsService {
             Member member = memberRepository.findBySocialId(socialId);
             String accessToken = "";
             String refreshToken = "";
-            if(member != null) {
+            if (member != null) {
                 accessToken = member.getSocialAccessToken();
                 refreshToken = member.getSocialRefreshToken();
             } else {
@@ -50,9 +56,7 @@ public class YoutubePlaylistItemsService {
                 return youtubePlaylistItemsDtoList;
             }
 
-            Credential credential = new Credential(BearerToken.authorizationHeaderAccessMethod())
-                    .setAccessToken(accessToken)
-                    .setRefreshToken(refreshToken);
+            Credential credential = authorize(accessToken, refreshToken);
 
             youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                     .setApplicationName("my-playlist").build();
@@ -130,6 +134,21 @@ public class YoutubePlaylistItemsService {
         PlaylistItem returnedPlaylistItem = playlistItemsInsertCommand.execute();
 
         return returnedPlaylistItem.getId();
+    }
+
+    private Credential authorize(String accessToken, String refreshToken) {
+
+        Credential credential = new Credential.Builder(BearerToken.authorizationHeaderAccessMethod())
+                .setJsonFactory(JSON_FACTORY)
+                .setTransport(HTTP_TRANSPORT)
+                .setClientAuthentication(new ClientParametersAuthentication(CLIENT_ID, CLIENT_SECRET))
+                .setTokenServerEncodedUrl(TOKEN_URI)
+                .build();
+
+        credential.setAccessToken(accessToken);
+        credential.setRefreshToken(refreshToken);
+
+        return credential;
     }
 
     /*public String get(String socialId, String playlistId, List<YoutubePlaylistItemsDto> youtubePlaylistItemsDtoList, String pageToken) {
