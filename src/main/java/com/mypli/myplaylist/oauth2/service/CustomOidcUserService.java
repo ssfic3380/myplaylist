@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -41,7 +42,9 @@ public class CustomOidcUserService extends OidcUserService {
         //1. 성공 정보를 바탕으로 Service 객체를 생성하고, 이로부터 User를 받아온다.
         OAuth2UserService delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(request);
-        OAuth2AccessToken accessToken = request.getAccessToken();
+
+        String accessToken = request.getAccessToken().getTokenValue();
+        String refreshToken = (String) request.getAdditionalParameters().get(OAuth2ParameterNames.REFRESH_TOKEN);
 
         //2. 받은 OAuth2User로부터 정보를 뽑는다.
         String registrationId = request.getClientRegistration().getRegistrationId();
@@ -56,10 +59,10 @@ public class CustomOidcUserService extends OidcUserService {
         //4. DB에 User 정보를 저장하거나, 바뀐 정보를 업데이트한다. (회원 가입)
         Member member = memberRepository.findBySocialId(attributes.getOauthId());
         if(member != null) {
-            member = updateMember(member, attributes, accessToken);
+            member = updateMember(member, attributes, accessToken, refreshToken);
         }
         else {
-            member = registerMember(attributes, accessToken);
+            member = registerMember(attributes, accessToken, refreshToken);
         }
 
         //5. 권한을 ROLE_USER로 설정하고, SuccessHandler 혹은 FailureHandler가 사용할 수 있도록 등록한다.
@@ -67,27 +70,27 @@ public class CustomOidcUserService extends OidcUserService {
                 Collections.singleton(new SimpleGrantedAuthority(Role.ROLE_USER.getKey())),
                 attributes.getAttributes(),
                 attributes.getNameAttributeKey());
-
     }
 
     @Transactional
-    Member updateMember(Member member, OAuth2Attributes attributes, OAuth2AccessToken accessToken) {
+    Member updateMember(Member member, OAuth2Attributes attributes, String accessToken, String refreshToken) {
         //MemberProfile 업데이트
         MemberProfile memberProfile = member.getMemberProfile();
         memberProfile.updateProfile(attributes.getName(), attributes.getEmail(), attributes.getPicture());
 
-        //SocialAccessToken 업데이트
-        member.updateSocialAccessToken(accessToken.getTokenValue());
+        //SocialToken 업데이트
+        member.updateSocialAccessToken(accessToken);
+        if (refreshToken != null) member.updateSocialRefreshToken(refreshToken);
 
         return memberRepository.save(member);
     }
 
     @Transactional
-    Member registerMember(OAuth2Attributes attributes, OAuth2AccessToken accessToken) {
+    Member registerMember(OAuth2Attributes attributes, String accessToken, String refreshToken) {
         Member member = attributes.toEntity();
-        member.updateSocialAccessToken(accessToken.getTokenValue());
+        member.updateSocialAccessToken(accessToken);
+        if (refreshToken != null) member.updateSocialRefreshToken(refreshToken);
 
         return memberRepository.save(member);
     }
-
 }

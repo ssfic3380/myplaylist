@@ -10,13 +10,10 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.*;
-import com.google.auth.Credentials;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.dto.PlaylistDto;
-import com.mypli.myplaylist.dto.youtube.YoutubePlaylistsDto;
+import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
 import com.mypli.myplaylist.repository.MemberRepository;
-import com.mypli.myplaylist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,9 +39,9 @@ public class YoutubePlaylistsService {
     @Value("${app.youtube.clientSecret}") private String CLIENT_SECRET;
     @Value("${app.youtube.tokenUri}") private String TOKEN_URI;
 
-    public List<YoutubePlaylistsDto> getPlaylists(String socialId) {
+    public List<YoutubePlaylistDto> getPlaylists(String socialId) {
 
-        List<YoutubePlaylistsDto> youtubePlaylistsDtoList = new ArrayList<>();
+        List<YoutubePlaylistDto> youtubePlaylistDtoList = new ArrayList<>();
 
         try {
 
@@ -56,7 +53,7 @@ public class YoutubePlaylistsService {
                 refreshToken = member.getSocialRefreshToken();
             } else {
                 log.error("Cannot find member from JwtAccessToken");
-                return youtubePlaylistsDtoList;
+                return youtubePlaylistDtoList;
             }
 
             Credential credential = authorize(accessToken, refreshToken);
@@ -81,7 +78,7 @@ public class YoutubePlaylistsService {
             } while (nextToken != null);
 
             if (playlistsList != null) {
-                makeDtoList(playlistsList.iterator(), youtubePlaylistsDtoList);
+                makeDtoList(playlistsList.iterator(), youtubePlaylistDtoList);
             }
 
         } catch (GoogleJsonResponseException e) {
@@ -92,7 +89,7 @@ public class YoutubePlaylistsService {
             log.error("유튜브 API에서 에러가 발생했습니다.", t);
         }
 
-        return youtubePlaylistsDtoList;
+        return youtubePlaylistDtoList;
     }
 
     public String insertPlaylist(String socialId, PlaylistDto playlistDto) throws IOException {
@@ -114,7 +111,7 @@ public class YoutubePlaylistsService {
         return playlistInserted.getId();
     }
 
-    private void makeDtoList(Iterator<Playlist> iteratorPlaylists, List<YoutubePlaylistsDto> youtubePlaylistsDtoList) {
+    private void makeDtoList(Iterator<Playlist> iteratorPlaylists, List<YoutubePlaylistDto> youtubePlaylistDtoList) {
 
         if (!iteratorPlaylists.hasNext()) log.error("검색 결과가 없습니다.");
 
@@ -126,13 +123,13 @@ public class YoutubePlaylistsService {
             String title = singlePlaylist.getSnippet().getTitle();
             String thumbnail = singlePlaylist.getSnippet().getThumbnails().getDefault().getUrl();
 
-            YoutubePlaylistsDto currentItem = YoutubePlaylistsDto.builder()
+            YoutubePlaylistDto currentItem = YoutubePlaylistDto.builder()
                     .playlistId(playlistId)
                     .title(title)
                     .thumbnail(thumbnail)
                     .build();
 
-            youtubePlaylistsDtoList.add(currentItem);
+            youtubePlaylistDtoList.add(currentItem);
         }
     }
 

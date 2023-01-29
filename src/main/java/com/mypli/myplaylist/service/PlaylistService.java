@@ -1,11 +1,8 @@
 package com.mypli.myplaylist.service;
 
-import com.mypli.myplaylist.dto.PlaylistDto;
 import com.mypli.myplaylist.domain.Playlist;
+import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.repository.PlaylistRepository;
-import com.mypli.myplaylist.service.youtube.YoutubePlaylistItemsService;
-import com.mypli.myplaylist.service.youtube.YoutubePlaylistsService;
-import com.mypli.myplaylist.service.youtube.YoutubeSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,9 +18,7 @@ import java.util.Optional;
 public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
-    private final YoutubePlaylistsService youtubePlaylistsService;
-    private final YoutubePlaylistItemsService youtubePlaylistItemsService;
-    private final YoutubeSearchService youtubeSearchService;
+    private final MusicService musicService;
 
     //==생성==//
     /**
@@ -46,7 +41,7 @@ public class PlaylistService {
      * 5. 프론트에서 해당 플레이리스트를 그려주고 끝
      *
      */
-    public Long createPlaylistFromYoutube(String socialId, String title, String videoOwnerChannelTitle, String resourceId) {
+    public Long createPlaylistFromYoutube(String socialId, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
 
         Playlist newPlaylist = Playlist.builder()
                 .playlistName("asdf")
@@ -65,7 +60,7 @@ public class PlaylistService {
     /**
      * 전체 플레이리스트 조회 (N개)
      */
-    public List<Playlist> findPlaylists() {
+    public List<Playlist> findAll() {
         return playlistRepository.findAll();
     }
 
@@ -77,7 +72,14 @@ public class PlaylistService {
     }
 
     /**
-     * "플레이리스트 이름"으로 조회 (1개)
+     * "플레이리스트 아이디"로 조회 (1개)
+     */
+    public Optional<Playlist> findByPlaylistId(String playlistId) {
+        return playlistRepository.findById(Long.parseLong(playlistId));
+    }
+
+    /**
+     * "플레이리스트 이름"으로 조회 (1개) => 중복 이름이 있는데..
      */
     public Playlist findByPlaylistName(String playlistName) {
         return playlistRepository.findByPlaylistName(playlistName);
@@ -89,7 +91,7 @@ public class PlaylistService {
      * 플레이리스트 삭제
      */
     @Transactional
-    public void deletePlaylist(Long playlistId) {
+    public void deleteByPlaylistId(Long playlistId) {
         playlistRepository.deleteById(playlistId);
     }
 }

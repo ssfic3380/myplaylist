@@ -1,7 +1,7 @@
 package com.mypli.myplaylist.controller;
 
-import com.mypli.myplaylist.dto.youtube.YoutubePlaylistsDto;
-import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemsDto;
+import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
+import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.dto.youtube.YoutubeSearchDto;
 import com.mypli.myplaylist.service.youtube.YoutubePlaylistItemsService;
 import com.mypli.myplaylist.service.youtube.YoutubePlaylistsService;
@@ -23,12 +23,12 @@ public class YoutubeTestController {
     private final YoutubeSearchService youtubeSearchService;
 
     @GetMapping("youtube1")
-    public List<YoutubePlaylistsDto> playlist_list() {
+    public List<YoutubePlaylistDto> playlist_list() {
         return youtubePlaylistService.getPlaylists("111511732184187189491");
     }
 
     @GetMapping("youtube2")
-    public List<YoutubePlaylistItemsDto> playlistItems_list() {
+    public List<YoutubePlaylistItemDto> playlistItems_list() {
         return youtubePlaylistItemsService.getPlaylistItems("111511732184187189491", "PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK");
     }
 

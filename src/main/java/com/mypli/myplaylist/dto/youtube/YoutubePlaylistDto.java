@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class YoutubePlaylistsDto {
+public class YoutubePlaylistDto {
 
     private String playlistId;
     private String title;
     private String thumbnail;
 
     @Builder
-    public YoutubePlaylistsDto(String playlistId, String title, String thumbnail) {
+    public YoutubePlaylistDto(String playlistId, String title, String thumbnail) {
         this.playlistId = playlistId;
         this.title = title;
         this.thumbnail = thumbnail;

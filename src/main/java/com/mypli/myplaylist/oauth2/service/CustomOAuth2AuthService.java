@@ -43,6 +43,7 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
 
         String accessToken = request.getAccessToken().getTokenValue();
         String refreshToken = (String) request.getAdditionalParameters().get(OAuth2ParameterNames.REFRESH_TOKEN);
+        //TODO: CustomAuthorizationRequestResolver의 additionalParameter("prompt", "consent")를 뺐을 때, refreshToken이 null인지 다른 값인지 확인
 
         //2. 받은 OAuth2User로부터 등록 ID(registration ID)와 PK(userNameAttributeName)를 뽑는다.
         /**
@@ -87,7 +88,7 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
 
         //SocialToken 업데이트
         member.updateSocialAccessToken(accessToken);
-        member.updateSocialRefreshToken(refreshToken);
+        if (refreshToken != null) member.updateSocialRefreshToken(refreshToken);
 
         return memberRepository.save(member);
     }
@@ -96,7 +97,7 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
     Member registerMember(OAuth2Attributes attributes, String accessToken, String refreshToken) {
         Member member = attributes.toEntity();
         member.updateSocialAccessToken(accessToken);
-        member.updateSocialRefreshToken(refreshToken);
+        if (refreshToken != null) member.updateSocialRefreshToken(refreshToken);
 
         return memberRepository.save(member);
     }
