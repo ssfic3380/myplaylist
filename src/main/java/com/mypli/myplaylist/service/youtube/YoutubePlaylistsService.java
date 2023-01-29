@@ -95,6 +95,25 @@ public class YoutubePlaylistsService {
         return youtubePlaylistsDtoList;
     }
 
+    public String insertPlaylist(String socialId, PlaylistDto playlistDto) throws IOException {
+
+        PlaylistSnippet playlistSnippet = new PlaylistSnippet();
+        playlistSnippet.setTitle(playlistDto.getPlaylistName());
+        playlistSnippet.setDescription("마플리(My Playlist)에서 만든 플레이리스트");
+
+        PlaylistStatus playlistStatus = new PlaylistStatus();
+        playlistStatus.setPrivacyStatus("private");
+
+        Playlist youtubePlaylist = new Playlist();
+        youtubePlaylist.setSnippet(playlistSnippet);
+        youtubePlaylist.setStatus(playlistStatus);
+
+        YouTube.Playlists.Insert playlistInsertCommand = youtube.playlists().insert("snippet,status", youtubePlaylist);
+        Playlist playlistInserted = playlistInsertCommand.execute();
+
+        return playlistInserted.getId();
+    }
+
     private void makeDtoList(Iterator<Playlist> iteratorPlaylists, List<YoutubePlaylistsDto> youtubePlaylistsDtoList) {
 
         if (!iteratorPlaylists.hasNext()) log.error("검색 결과가 없습니다.");
@@ -115,25 +134,6 @@ public class YoutubePlaylistsService {
 
             youtubePlaylistsDtoList.add(currentItem);
         }
-    }
-
-    public String insertPlaylist(String socialId, PlaylistDto playlistDto) throws IOException {
-
-        PlaylistSnippet playlistSnippet = new PlaylistSnippet();
-        playlistSnippet.setTitle(playlistDto.getPlaylistName());
-        playlistSnippet.setDescription("마플리(My Playlist)에서 만든 플레이리스트");
-
-        PlaylistStatus playlistStatus = new PlaylistStatus();
-        playlistStatus.setPrivacyStatus("private");
-
-        Playlist youtubePlaylist = new Playlist();
-        youtubePlaylist.setSnippet(playlistSnippet);
-        youtubePlaylist.setStatus(playlistStatus);
-
-        YouTube.Playlists.Insert playlistInsertCommand = youtube.playlists().insert("snippet,status", youtubePlaylist);
-        Playlist playlistInserted = playlistInsertCommand.execute();
-
-        return playlistInserted.getId();
     }
 
     private Credential authorize(String accessToken, String refreshToken) {

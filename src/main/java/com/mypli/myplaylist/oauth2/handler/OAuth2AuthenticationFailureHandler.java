@@ -43,8 +43,5 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
         authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
-
     }
-
-
 }

@@ -92,7 +92,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
-
     }
 
     private boolean compareWithDB(String refreshToken, Member member) {
@@ -101,8 +100,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     public void setErrorResponse(HttpServletResponse response, HttpStatus status, String msg) {
+
         response.setStatus(status.value());
         response.setContentType("application/json");
+
         try {
         String json = new ObjectMapper().writeValueAsString(new ApiResponseHeader(status.value(), msg));
         response.getWriter().write(json);

@@ -46,26 +46,23 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Value("${app.oauth2.authorizedRedirectUris}")
     private final ArrayList<String> AUTHORIZED_REDIRECT_URIS;
     private final String REFRESH_TOKEN = "refresh-token";
-    private final String SOCIAL_ACCESS_TOKEN = "social-access-token";
     private final int COOKIE_PERIOD = 60 * 60 * 24; //하루
 
     @Transactional
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
-        log.info("Authentication Success");
+        log.info("Authentication Success: socialId = {}", authentication.getName());
 
         String targetUrl = determineTargetUrl(request, response, authentication);
-        log.info("targetUrl = {}", targetUrl);
 
         if (response.isCommitted()) {
-            log.debug("응답이 이미 커밋되었습니다. " + targetUrl + "로 리다이렉션을 할 수 없습니다.");
+            log.debug("Response has already been committed. Unable to redirect to {}", targetUrl);
             return;
         }
 
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
-
     }
 
     @Transactional
@@ -76,7 +73,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .map(Cookie::getValue);
 
         if (redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
-            throw new IllegalArgumentException(("승인되지 않은 리다이렉션 URI가 있어 인증을 진행할 수 없습니다."));
+            throw new IllegalArgumentException(("Authentication Failed: Unauthorized Redirect URI"));
         }
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
@@ -84,20 +81,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         //2. Token 생성
         JwtToken token = tokenProvider.generateToken(authentication);
 
-        //3. Member 엔티티에 RefreshToken 입력
+        //3-1. Member 엔티티에 RefreshToken 입력
         String socialId = authentication.getName();
         Member member = memberRepository.findBySocialId(socialId);
         updateMemberRefreshToken(member, token.getRefreshToken());
 
-        //4. Cookie에 RefreshToken 추가
+        //3-2. Cookie에 RefreshToken 추가
         CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
         CookieUtils.addCookie(response, REFRESH_TOKEN, token.getRefreshToken(), COOKIE_PERIOD);
 
-        //4-1(임시). Cookie에 SocialAccessToken 추가 (AccessToken은 그냥 파라미터로 전달: header에 넣어봤자 redirect라서 없어지는듯)
-        CookieUtils.deleteCookie(request, response, SOCIAL_ACCESS_TOKEN);
-        CookieUtils.addCookie(response, SOCIAL_ACCESS_TOKEN, member.getSocialAccessToken(), COOKIE_PERIOD);
-
-        //5. AccessToken과 함께 원래 있던 곳으로 redirect
+        //4. AccessToken과 함께 원래 있던 곳으로 redirect
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token.getAccessToken())
                 .build().toUriString();
@@ -114,6 +107,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private boolean isAuthorizedRedirectUri(String uri) {
+
         URI clientRedirectUri = URI.create(uri);
 
         return AUTHORIZED_REDIRECT_URIS
@@ -122,12 +116,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     // host와 port만 검증한다. path는 클라이언트가 원하는 대로 정하도록 한다.
                     URI authorizedURI = URI.create(uris);
                     if (authorizedURI.getHost().equalsIgnoreCase(clientRedirectUri.getHost())
-                        && authorizedURI.getPort() == clientRedirectUri.getPort()) {
+                            && authorizedURI.getPort() == clientRedirectUri.getPort()) {
                         return true;
                     }
-                    log.info("authorized false");
                     return false;
                 });
     }
-
 }

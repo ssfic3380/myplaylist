@@ -44,6 +44,7 @@ public class JwtTokenProvider {
     }
 
     public JwtToken generateToken(Authentication authentication) {
+
         //권한 추출
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -72,6 +73,7 @@ public class JwtTokenProvider {
     }
 
     public JwtToken renewToken(String oldAccessToken, String refreshToken) {
+
         long now = (new Date()).getTime();
         long validTime = parseClaims(refreshToken).getExpiration().getTime() - now;
 
@@ -101,6 +103,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String accessToken) {
+
         //토큰 복호화
         Claims claims = parseClaims(accessToken);
 
@@ -123,6 +126,7 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
+
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -142,6 +146,7 @@ public class JwtTokenProvider {
     }
 
     public Claims parseClaims(String accessToken) {
+
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -151,5 +156,4 @@ public class JwtTokenProvider {
             return e.getClaims(); //만료됐더라도 정보를 꺼내기 위해서 return
         }
     }
-
 }

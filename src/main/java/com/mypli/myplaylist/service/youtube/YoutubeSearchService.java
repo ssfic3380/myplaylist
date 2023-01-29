@@ -39,7 +39,6 @@ public class YoutubeSearchService {
         List<YoutubeSearchDto> youtubeSearchDtoList = new ArrayList<>();
 
         try {
-
             youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
                 @Override
                 public void initialize(HttpRequest request) throws IOException {
