@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,16 +24,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PlaylistController {
 
-    private final JwtTokenProvider tokenProvider;
     private final PlaylistService playlistService;
     private final YoutubePlaylistsService youtubePlaylistsService;
     private final YoutubePlaylistItemsService youtubePlaylistItemsService;
 
     @GetMapping("/")
-    public String getAllPlaylists(HttpServletRequest request) {
+    public String getAllPlaylists(Principal principal) {
         //마플리 홈페이지 (유저의 모든 플레이리스트 보여주기)
 
-        String socialId = getSocialId(request);
+        String socialId = principal.getName();
         Optional<Playlist> playlists;
 
         if (socialId != null) playlists = playlistService.findBySocialId(socialId);
@@ -41,7 +41,7 @@ public class PlaylistController {
         }
         //TODO: 플레이리스트 이름, img만 보내주면 될듯? DTO로
 
-        return null;
+        return "home";
     }
 
     @GetMapping("/playlist/{playlistId}")
@@ -51,38 +51,34 @@ public class PlaylistController {
         Optional<Playlist> playlist = playlistService.findByPlaylistId(playlistId);
         //TODO: 플레이리스트 DTO를 넘겨서 관련된 Music까지 싹 보여줘야함
 
-        return null;
+        return "home";
     }
 
     @GetMapping("/youtube/playlists")
-    public String getYoutubePlaylists(HttpServletRequest request, Model model) {
+    public String getYoutubePlaylists(Principal principal, Model model) {
         //유튜브에서 불러오기를 클릭했을 경우
 
-        String socialId = getSocialId(request);
+        String socialId = principal.getName();
 
         List<YoutubePlaylistDto> youtubePlaylistDtoList = youtubePlaylistsService.getPlaylists(socialId);
         model.addAttribute("youtubePlaylists", youtubePlaylistDtoList);
 
         //TODO: return 뭐로해야할지(팝업창에 띄워주고싶음)
-        return null;
+        return "home";
     }
 
     @PostMapping("/youtube/playlists")
-    public String createPlaylistFromYoutube(HttpServletRequest request,
+    public String createPlaylistFromYoutube(Principal principal,
                                             @ModelAttribute("YoutubePlaylist") YoutubePlaylistDto youtubePlaylistDto) {
-        //유튜브 플레이리스트를 선택했을 경우
+        //유튜브 플레이리스트를 골랐을 경우
 
-        String socialId = getSocialId(request);
+        String socialId = principal.getName();
 
         List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList = youtubePlaylistItemsService.getPlaylistItems(socialId, youtubePlaylistDto.getPlaylistId());
-        Long playlistId = playlistService.createPlaylistFromYoutube(socialId, youtubePlaylistItemDtoList);
+        Long playlistId = playlistService.createPlaylistFromYoutube(socialId, youtubePlaylistDto, youtubePlaylistItemDtoList);
+
+        log.info("New playlistId = {}", playlistId);
 
         return "redirect:/playlist/{playlistId}";
     }
-
-    private String getSocialId(HttpServletRequest request) {
-        String accessToken = HeaderUtils.getAccessToken(request);
-        return tokenProvider.parseClaims(accessToken).getSubject();
-    }
-
 }

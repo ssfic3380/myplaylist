@@ -47,11 +47,7 @@ public class Playlist {
     //==연관관계 메서드==//
     public void setMember(Member member) {
         this.member = member;
-    }
-
-    public void addMusic(Music music) {
-        musicList.add(music);
-        music.setPlaylist(this);
+        member.getPlaylists().add(this);
     }
 
     //==생성 메서드==//
@@ -59,6 +55,17 @@ public class Playlist {
     public Playlist(String playlistName, String playlistImg) {
         this.playlistName = playlistName;
         this.playlistImg = playlistImg;
+    }
+
+    public static Playlist createPlaylist(Member member, String playlistName, String playlistImg) {
+        Playlist playlist = Playlist.builder()
+                .playlistName(playlistName)
+                .playlistImg(playlistImg)
+                .build();
+
+        playlist.setMember(member);
+
+        return playlist;
     }
 
     //==비즈니스 로직==//

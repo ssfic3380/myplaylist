@@ -36,8 +36,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         //1. Request Header의 "Authorization: Bearer "에서 Access Token을 꺼낸다.
-        String accessToken = HeaderUtils.getAccessToken(request);
-        //String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc0NTkwNjU3fQ.O9DNbz4flKhIRn6-iMEoihAM_im_Q_imhg4YRCxyMNmY0e1m4OTjrorkJORrtKVasdPsity9gGJP3BGGRdG_6Q";
+        //String accessToken = HeaderUtils.getAccessToken(request);
+        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc1MTAxNDAxfQ.2yO3OsQYeEVix2_iYsADzjWKMsg1LTHEThaiNaQ1sAFSR6VvvwxacVe1B9BjoeRdCslYtK0NVQ7Uvb7LB4hXUQ";
         String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
                 .orElse((null));
@@ -56,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (tokenProvider.validateToken(accessToken)) { //AccessToken 정상
                 Authentication authentication = tokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("Filter Passed");
+                log.info("JWT Authenticated");
             }
 
             else if (StringUtils.hasText(refreshToken)) { //AccessToken 비정상, RefreshToken 존재
@@ -82,9 +82,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         //DB의 RefreshToken 갱신
                         member.updateJwtRefreshToken(refreshToken);
 
+                        log.info("Renewed Refresh Token: socialId = {}", oauthId);
                     }
                     else { //RefreshToken이 만료됐거나, DB와 일치하지 않을 경우
-                        setErrorResponse(response, HttpStatus.BAD_REQUEST, "RefreshToken Expired");
+                        setErrorResponse(response, HttpStatus.BAD_REQUEST, "Refresh Token Expired");
                         return;
                     }
                 }

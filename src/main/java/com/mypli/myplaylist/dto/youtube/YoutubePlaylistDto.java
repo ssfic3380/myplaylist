@@ -3,8 +3,11 @@ package com.mypli.myplaylist.dto.youtube;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
+import java.util.regex.Pattern;
+
+@Getter @Setter
 @NoArgsConstructor
 public class YoutubePlaylistDto {
 

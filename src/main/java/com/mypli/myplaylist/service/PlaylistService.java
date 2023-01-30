@@ -1,13 +1,19 @@
 package com.mypli.myplaylist.service;
 
+import com.mypli.myplaylist.domain.Member;
+import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
+import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
+import com.mypli.myplaylist.repository.MemberRepository;
+import com.mypli.myplaylist.repository.MusicRepository;
 import com.mypli.myplaylist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +23,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PlaylistService {
 
+    private final MemberRepository memberRepository;
     private final PlaylistRepository playlistRepository;
-    private final MusicService musicService;
+    private final MusicRepository musicRepository;
 
     //==생성==//
     /**
@@ -32,7 +39,7 @@ public class PlaylistService {
      * 4. Controller에서 PostMapping
      *    4-1. Reqeust에서 JwtAccessToken을 추출
      *    4-2. JwtAccessToken에서 socialId 추출
-     *    4-3. Post할 때 playlistId를 query parameter로 전달
+     *    4-3. Post할 때 YoutubePlaylistDTO를 query parameter로 전달
      *    4-4. socialId를 이용하여 getPlaylistItems(socialId, youtubePlaylistId)를 호출해서 DTO를 만들어서
      *         PlaylistService의 createPlaylistFromYoutube(...)로 넘김
      *    4-5. PlaylistService는 MusicService를 호출해서 title, artist, album=null, videoId, order(1부터시작)으로 각각을 Music으로 만들고,
@@ -41,17 +48,30 @@ public class PlaylistService {
      * 5. 프론트에서 해당 플레이리스트를 그려주고 끝
      *
      */
-    public Long createPlaylistFromYoutube(String socialId, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
+    @Transactional
+    public Long createPlaylistFromYoutube(String socialId, YoutubePlaylistDto youtubePlaylistDto, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
 
-        Playlist newPlaylist = Playlist.builder()
-                .playlistName("asdf")
-                .playlistImg("zxcv")
-                .build();
+        Member member = memberRepository.findBySocialId(socialId);
 
-        return newPlaylist.getId();
+        Playlist newPlaylist = Playlist.createPlaylist(member, youtubePlaylistDto.getTitle(), youtubePlaylistDto.getThumbnail());
+
+        Long musicOrder = 1L;
+        for (YoutubePlaylistItemDto youtubePlaylistItemDto : youtubePlaylistItemDtoList) {
+            Music.createMusic(newPlaylist,
+                    youtubePlaylistItemDto.getTitle(),
+                    youtubePlaylistItemDto.getArtist(),
+                    youtubePlaylistItemDto.getAlbum(),
+                    youtubePlaylistItemDto.getVideoId(),
+                    youtubePlaylistItemDto.getThumbnail(),
+                    musicOrder);
+
+            musicOrder++;
+        }
+
+        return playlistRepository.save(newPlaylist).getId();
     }
 
-    public void savePlaylistToYoutube(String socialId) {
+    public void exportPlaylistToYoutube(String socialId) {
 
     }
 

@@ -135,10 +135,6 @@ public class YoutubePlaylistsService {
 
     private Credential authorize(String accessToken, String refreshToken) {
 
-        log.info("client_id = {}", CLIENT_ID);
-        log.info("client_secret = {}", CLIENT_SECRET);
-        log.info("token_uri = {}", TOKEN_URI);
-
         Credential credential = new Credential.Builder(BearerToken.authorizationHeaderAccessMethod())
                 .setJsonFactory(JSON_FACTORY)
                 .setTransport(HTTP_TRANSPORT)

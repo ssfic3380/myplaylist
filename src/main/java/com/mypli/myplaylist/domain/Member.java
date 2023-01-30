@@ -56,11 +56,6 @@ public class Member {
         memberProfile.setMember(this);
     }
 
-    public void addPlaylist(Playlist playlist) {
-        playlists.add(playlist);
-        playlist.setMember(this);
-    }
-
     //==생성 메서드==//
     @Builder
     public Member(Role role, SocialCode socialCode, String socialId, String socialAccessToken, String socialRefreshToken, String jwtRefreshToken, MemberProfile memberProfile) {

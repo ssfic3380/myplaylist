@@ -35,7 +35,7 @@ public class Music {
     private String musicImg;
 
     @NotNull
-    private Long order; //플레이리스트에서의 출력 순서 정보
+    private Long musicOrder; //플레이리스트에서의 출력 순서 정보
 
     //==연관관계==//
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,16 +46,32 @@ public class Music {
     //==연관관계 메서드==//
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
+        playlist.getMusicList().add(this);
     }
 
     //==생성 메서드==//
     @Builder
-    public Music(String title, String artist, String album, String videoId, String musicImg, Long order) {
+    public Music(String title, String artist, String album, String videoId, String musicImg, Long musicOrder) {
         this.title = title;
         this.artist = artist;
         this.album = album;
         this.videoId = videoId;
         this.musicImg = musicImg;
-        this.order = order;
+        this.musicOrder = musicOrder;
+    }
+
+    public static Music createMusic(Playlist playlist, String title, String artist, String album, String videoId, String musicImg, Long musicOrder) {
+        Music music = Music.builder()
+                .title(title)
+                .artist(artist)
+                .album(album)
+                .videoId(videoId)
+                .musicImg(musicImg)
+                .musicOrder(musicOrder)
+                .build();
+
+        music.setPlaylist(playlist);
+
+        return music;
     }
 }

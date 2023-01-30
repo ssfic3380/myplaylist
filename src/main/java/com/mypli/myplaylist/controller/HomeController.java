@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.util.Map;
 
 @Slf4j
@@ -30,8 +31,10 @@ public class HomeController {
 
     @GetMapping("/home")
     public String home(Model model,
-                       HttpServletRequest request) {
+                       HttpServletRequest request,
+                       Principal principal) {
 
+        if(principal != null) log.info("principal.getName() = {}", principal.getName());
 /*        String socialId = SecurityUtils.getCurrentMemberId();
         log.info("home socialId = {}", socialId);
         if (socialId.equals("anonymousUser")) {
@@ -49,11 +52,6 @@ public class HomeController {
                         .map(cookie -> cookie.getValue())
                         .orElse(null);
 
-        String socialAccessToken = CookieUtils.getCookie(request, "social-access-token")
-                        .map(cookie -> cookie.getValue())
-                        .orElse(null);
-
-        model.addAttribute("socialAccessToken", socialAccessToken);
         model.addAttribute("jwtAccessToken", jwtAccessToken);
         model.addAttribute("refreshToken", refreshToken);
 

@@ -3,8 +3,9 @@ package com.mypli.myplaylist.dto.youtube;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
+@Getter @Setter
 @NoArgsConstructor
 public class YoutubePlaylistItemDto {
 

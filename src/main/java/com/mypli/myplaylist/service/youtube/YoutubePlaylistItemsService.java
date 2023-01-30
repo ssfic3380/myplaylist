@@ -129,6 +129,7 @@ public class YoutubePlaylistItemsService {
                     .videoId(videoId)
                     .title(title)
                     .artist(artist)
+                    .album("")
                     .thumbnail(thumbnail)
                     .build();
 
