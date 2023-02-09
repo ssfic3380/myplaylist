@@ -7,6 +7,7 @@ package com.mypli.myplaylist.oauth2.exception;
  */
 //자원 없음 예외
 public class OAuth2NotFoundException extends RuntimeException {
+
     public OAuth2NotFoundException() {
     }
 

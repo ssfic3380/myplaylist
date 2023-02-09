@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<div th:fragment="headerFragment">
-    <h1>Header Section</h1>
-</div>
+<header th:fragment="headerFragment" class="p-2 bg-dark">
+    <div class="container-fluid px-2">
+        <div class="row d-flex flex-wrap justify-content-between justify-content-start align-items-center m-1">
+            <ul class="nav col-6 col-lg-auto justify-content-center me-lg-auto mb-2 mb-md-0">
+                <li><a href="/home" class="nav-link px-2 text-white">홈</a></li>
+            </ul>
+            <div class="col-6 d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-light me-2" onclick="location.href='/oauth2/login'">로그인</button>
+            </div>
+        </div>
+    </div>
+
+</header>
 
 </html>

@@ -1,8 +1,33 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<div th:fragment="sidebarFragment">
-    <h1>Sidebar Section</h1>
-</div>
+<aside th:fragment="sidebarFragment">
+
+    <div id="playlist-name" class="d-flex flex-column align-items-center my-3">
+        <h2 class="text-white-50"><strong>현재 플레이리스트</strong></h2>
+        <h3 class="text-white">여행</h3>
+    </div>
+
+    <div id="player" class="w-100"></div>
+
+    <div id="youtube-items" class="d-flex flex-column align-items-stretch flex-shrink-0">
+        <div class="list-group list-group-flush border-bottom scrollarea">
+            <a href="#" class="list-group-item list-group-item-action py-3 lh-sm d-flex align-items-center active" aria-current="true">
+                <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                <div class="d-flex flex-column align-items-center justify-content-center ms-2">
+                    <span class="col-12 my-1">사랑이란 멜로는 없어</span>
+                    <span class="col-12 my-1 small">전상근</span>
+                </div>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action py-3 lh-sm d-flex align-items-center">
+                <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                <div class="d-flex flex-column align-items-center justify-content-center ms-2">
+                    <span class="col-12 my-1">사랑이란 멜로는 없어</span>
+                    <span class="col-12 my-1 small">전상근</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</aside>
 
 </html>

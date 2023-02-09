@@ -5,21 +5,56 @@
       layout:decorate="~{layouts/defaultLayout}">
 
 <th:block layout:fragment="css">
-    <link rel="stylesheet" th:href="@{/css/social-button.css}">
 </th:block>
 
 <th:block layout:fragment="script">
-    <script th:inline="javascript">
-
-    </script>
+    <script th:inline="javascript"></script>
 </th:block>
 
 <th:block layout:fragment="content">
-    <div class="main">
-        <h1>소셜 로그인 성공</h1>
-        jwtAccessToken: <h2 th:text="${jwtAccessToken}"> jwt액세스 </h2>
-        refreshToken: <h2 th:text="${refreshToken}"> 리프레시 </h2>
-    </div>
+    <main>
+        <div class="container-fluid p-3">
+            <div class="row m-2" style="height: 100px">
+                <div class="col-5 p-2 d-flex justify-content-start align-items-center">
+                    <h1 class="text-center fw-bold">플레이리스트 목록</h1>
+                </div>
+                <div class="col-7 d-flex justify-content-end align-items-center">
+                    <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">추가</button>
+                    <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">삭제</button>
+                    <form class="w-25 me-4" role="search">
+                        <input type="search" class="form-control" placeholder="플레이리스트 검색" aria-label="Search">
+                    </form>
+                </div>
+            </div>
+            <div class="row d-flex flex-wrap justify-content-start justify-content-between align-content-start px-2 m-4">
+                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e;">
+                    <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                    <p class="text-center text-white fw-bold">여행</p>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e;">
+                    <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                    <p class="text-center text-white fw-bold">여행</p>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e;">
+                    <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                    <p class="text-center text-white fw-bold">여행</p>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e;">
+                    <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                    <p class="text-center text-white fw-bold">여행</p>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e;">
+                    <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                    <p class="text-center text-white fw-bold">여행</p>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e;">
+                    <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                    <p class="text-center text-white fw-bold">여행</p>
+                </div>
+            </div>
+            </div>
+        </div>
+    </main>
 </th:block>
 
 </html>

@@ -4,9 +4,62 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0, minimum-scale=1, user-scalable=yes, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0" />
 
     <title th:text="#{site.title}">마플리(My Playlist)</title>
+
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+
+    <script th:src="@{/js/sidebars.js}"></script>
+    <script th:inline="javascript">
+
+        var yPlayer;
+
+        // 1. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var playerHeight = firstScriptTag.parentElement.offsetHeight * 0.2;
+        var playerWidth = firstScriptTag.parentElement.offsetWidth;
+
+
+        // 2. This function creates an <iframe> (and YouTube player) after the API code downloads.
+        function onYouTubeIframeAPIReady() {
+            yPlayer = new YT.Player('player', {
+                height: playerHeight,
+                width: playerWidth,
+                videoId: '4UGQPrObSdE',
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // 3. The API will call this function when the video player is ready.
+        function onPlayerReady(event) {
+            yPlayer.setPlaybackRate(1);
+            yPlayer.playVideo();
+        }
+
+        // 4. The API calls this function when the player's state changes.
+        //    The function indicates that when playing a video (state=1),
+        //    the player should play for six seconds and then stop.
+        var done = false;
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING && !done) {
+                setTimeout(stopVideo, 6000);
+                done = true;
+            }
+        }
+        function stopVideo() {
+            player.stopVideo();
+        }
+    </script>
 
     <!-- content script -->
     <th:block layout:fragment="css"></th:block>
@@ -22,7 +75,7 @@
     <!-- content fragment 사용 -->
     <th:block layout:fragment="content"></th:block>
     <!-- footer fragment 사용 -->
-    <th:block th:replace="fragments/footer :: footerFragment"></th:block>
+    <!--<th:block th:replace="fragments/footer :: footerFragment"></th:block>-->
 </body>
 
 </html>

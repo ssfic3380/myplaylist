@@ -3,6 +3,7 @@ package com.mypli.myplaylist.oauth2.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mypli.myplaylist.controller.api.ApiResponseHeader;
 import com.mypli.myplaylist.domain.Member;
+import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.repository.MemberRepository;
 import com.mypli.myplaylist.utils.CookieUtils;
 import com.mypli.myplaylist.utils.HeaderUtils;
@@ -37,7 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         //1. Request Header의 "Authorization: Bearer "에서 Access Token을 꺼낸다.
         //String accessToken = HeaderUtils.getAccessToken(request);
-        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc1MTAxNDAxfQ.2yO3OsQYeEVix2_iYsADzjWKMsg1LTHEThaiNaQ1sAFSR6VvvwxacVe1B9BjoeRdCslYtK0NVQ7Uvb7LB4hXUQ";
+        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc1Njg4NTgyfQ._QzNj8HLX90Xjd--7ssGsRYYPlclrNp2s2i0UfmNMnUZWqeTOj7nqjmF2OEzczL1pKVPDEfcFna1d5nvrhw8yQ";
         String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
                 .orElse((null));
@@ -63,7 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (tokenProvider.validateToken(refreshToken)) { //RefreshToken은 일단 정상
 
                     String oauthId = tokenProvider.parseClaims(accessToken).getSubject();
-                    Member member = memberRepository.findBySocialId(oauthId);
+                    Member member = memberRepository.findBySocialId(oauthId).orElseThrow(MemberNotFoundException::new);
 
                     if (compareWithDB(refreshToken, member)) { //DB의 RefreshToken과도 같으면
                         JwtToken newToken = tokenProvider.renewToken(accessToken, refreshToken); //accessToken 재발급, refreshToken 3일 이하시 재발급
@@ -85,7 +86,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         log.info("Renewed Refresh Token: socialId = {}", oauthId);
                     }
                     else { //RefreshToken이 만료됐거나, DB와 일치하지 않을 경우
-                        setErrorResponse(response, HttpStatus.BAD_REQUEST, "Refresh Token Expired");
+                        //setErrorResponse(response, HttpStatus.BAD_REQUEST, "Refresh Token Expired");
+                        log.error("Refresh Token Expired");
+                        response.sendRedirect("/oauth2/login");
                         return;
                     }
                 }

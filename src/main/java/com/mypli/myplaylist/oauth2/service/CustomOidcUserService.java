@@ -3,6 +3,7 @@ package com.mypli.myplaylist.oauth2.service;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.MemberProfile;
 import com.mypli.myplaylist.domain.Role;
+import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.oauth2.OAuth2Attributes;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class CustomOidcUserService extends OidcUserService {
         OAuth2Attributes attributes = OAuth2Attributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         //4. DB에 User 정보를 저장하거나, 바뀐 정보를 업데이트한다. (회원 가입)
-        Member member = memberRepository.findBySocialId(attributes.getOauthId());
+        Member member = memberRepository.findBySocialId(attributes.getOauthId()).orElseThrow(MemberNotFoundException::new);
         if(member != null) {
             member = updateMember(member, attributes, accessToken, refreshToken);
         }

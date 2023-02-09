@@ -1,6 +1,7 @@
 package com.mypli.myplaylist.oauth2.handler;
 
 import com.mypli.myplaylist.domain.Member;
+import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.oauth2.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.mypli.myplaylist.oauth2.jwt.JwtToken;
 import com.mypli.myplaylist.oauth2.jwt.JwtTokenProvider;
@@ -83,7 +84,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         //3-1. Member 엔티티에 RefreshToken 입력
         String socialId = authentication.getName();
-        Member member = memberRepository.findBySocialId(socialId);
+        Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
         updateMemberRefreshToken(member, token.getRefreshToken());
 
         //3-2. Cookie에 RefreshToken 추가

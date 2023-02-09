@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -51,6 +52,17 @@ public class AuthController {
 //        log.info("socialId = {}", socialId);
 
         redirectAttributes.addFlashAttribute("token", token);
+        return "redirect:/home";
+    }
+
+    @GetMapping("/logout")
+    public String logout(Principal principal, HttpServletRequest request, HttpServletResponse response) {
+
+        String socialId = principal.getName();
+        memberService.updateJwtRefreshToken(socialId, "");
+
+        CookieUtils.deleteCookie(request, response, "refresh-token");
+
         return "redirect:/home";
     }
 
@@ -99,13 +111,6 @@ public class AuthController {
     private boolean compareWithDB(String refreshToken, Member member) {
         if (member == null) return false;
         return refreshToken.equals(member.getJwtRefreshToken());
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-
-        CookieUtils.deleteCookie(request, response, "refresh-token");
-        return "redirect:/home";
     }
 
 }

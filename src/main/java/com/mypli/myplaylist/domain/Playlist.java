@@ -70,6 +70,13 @@ public class Playlist {
 
     //==비즈니스 로직==//
     /**
+     * Playlist 삭제
+     */
+    public void deletePlaylist() {
+        this.member.getPlaylists().remove(this);
+    }
+
+    /**
      * Playlist Name 변경
      */
     public void updatePlaylistName(String playlistName) {

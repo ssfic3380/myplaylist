@@ -1,6 +1,7 @@
 package com.mypli.myplaylist.oauth2.userdetails;
 
 import com.mypli.myplaylist.domain.Member;
+import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +16,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetailsImpl loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findBySocialId(username);
+        Member member = memberRepository.findBySocialId(username).orElseThrow(MemberNotFoundException::new);
         if (member == null) throw new UsernameNotFoundException("No Found Member: " + username);
 
         UserDetailsImpl userDetails = new UserDetailsImpl();

@@ -3,8 +3,11 @@ package com.mypli.myplaylist.service;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
+import com.mypli.myplaylist.dto.PlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
+import com.mypli.myplaylist.exception.MemberNotFoundException;
+import com.mypli.myplaylist.exception.PlaylistNotFoundException;
 import com.mypli.myplaylist.repository.MemberRepository;
 import com.mypli.myplaylist.repository.MusicRepository;
 import com.mypli.myplaylist.repository.PlaylistRepository;
@@ -28,6 +31,19 @@ public class PlaylistService {
     private final MusicRepository musicRepository;
 
     //==생성==//
+    @Transactional
+    public Long create(String socialId, PlaylistDto playlistDto) {
+
+        Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
+
+        if (playlistDto.getPlaylistImg() == null) {
+            //TODO: 이미지가 없을 때, 기본 이미지를 넣어줘야 함
+        }
+        Playlist newPlaylist = Playlist.createPlaylist(member, playlistDto.getPlaylistName(), playlistDto.getPlaylistImg());
+
+        return playlistRepository.save(newPlaylist).getId();
+    }
+
     /**
      * 유튜브에서 플레이리스트 가져오기
      * 1. 프론트에서 "유튜브에서 불러오기" 클릭
@@ -49,9 +65,9 @@ public class PlaylistService {
      *
      */
     @Transactional
-    public Long createPlaylistFromYoutube(String socialId, YoutubePlaylistDto youtubePlaylistDto, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
+    public Long importFromYoutube(String socialId, YoutubePlaylistDto youtubePlaylistDto, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
 
-        Member member = memberRepository.findBySocialId(socialId);
+        Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
 
         Playlist newPlaylist = Playlist.createPlaylist(member, youtubePlaylistDto.getTitle(), youtubePlaylistDto.getThumbnail());
 
@@ -71,37 +87,37 @@ public class PlaylistService {
         return playlistRepository.save(newPlaylist).getId();
     }
 
-    public void exportPlaylistToYoutube(String socialId) {
+    public void exportToYoutube(String socialId, YoutubePlaylistDto youtubePlaylistDto, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
 
     }
 
 
     //==조회==//
     /**
-     * 전체 플레이리스트 조회 (N개)
+     * 전체 플레이리스트 조회 (N개) => TODO: 자기꺼만 보기때문에 필요 없는 메서드로 보임
      */
     public List<Playlist> findAll() {
         return playlistRepository.findAll();
     }
 
     /**
-     * "회원 번호"로 플레이리스트 조회 (1명 -> n개)
+     * "플레이리스트 아이디"로 조회(1개)
      */
-    public Optional<Playlist> findBySocialId(String socialId) {
+    public Playlist findById(String playlistId) {
+        return playlistRepository.findById(Long.parseLong(playlistId)).orElseThrow(PlaylistNotFoundException::new);
+    }
+
+    /**
+     * "회원 번호"로 플레이리스트 조회(1명 -> n개)
+     */
+    public List<Playlist> findBySocialId(String socialId) {
         return playlistRepository.findBySocialId(socialId);
     }
 
     /**
-     * "플레이리스트 아이디"로 조회 (1개)
+     * "플레이리스트 이름"으로 조회(n개) => 중복 이름 있으니까
      */
-    public Optional<Playlist> findByPlaylistId(String playlistId) {
-        return playlistRepository.findById(Long.parseLong(playlistId));
-    }
-
-    /**
-     * "플레이리스트 이름"으로 조회 (1개) => 중복 이름이 있는데..
-     */
-    public Playlist findByPlaylistName(String playlistName) {
+    public List<Playlist> findByName(String playlistName) {
         return playlistRepository.findByPlaylistName(playlistName);
     }
 
@@ -111,7 +127,9 @@ public class PlaylistService {
      * 플레이리스트 삭제
      */
     @Transactional
-    public void deleteByPlaylistId(Long playlistId) {
+    public void deleteById(Long playlistId) {
+        Playlist playlist = playlistRepository.findById(playlistId).orElseThrow(PlaylistNotFoundException::new);
+        playlist.deletePlaylist();
         playlistRepository.deleteById(playlistId);
     }
 }

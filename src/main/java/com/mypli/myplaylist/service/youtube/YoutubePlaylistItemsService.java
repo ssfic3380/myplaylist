@@ -13,6 +13,7 @@ import com.google.api.services.youtube.model.*;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.dto.MusicDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
+import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class YoutubePlaylistItemsService {
 
         try {
 
-            Member member = memberRepository.findBySocialId(socialId);
+            Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
             String accessToken = "";
             String refreshToken = "";
             if (member != null) {
