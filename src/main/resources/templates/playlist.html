@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/defaultLayout}">
+
+<th:block layout:fragment="css">
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript"></script>
+</th:block>
+
+<th:block layout:fragment="content">
+    <main>
+        <div class="container-fluid p-3">
+            <div class="row mx-2 mt-2" style="height: 100px">
+                <div class="col-5 d-flex justify-content-start align-items-center p-2">
+                    <h1 class="text-center fw-bold">여행</h1>
+                </div>
+                <div class="col-7 d-flex justify-content-end align-items-center">
+                    <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">유튜브로 내보내기</button>
+                    <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">유튜브에서 불러오기</button>
+                    <form class="w-25 me-4" role="search">
+                        <input type="search" class="form-control" placeholder="노래 검색" aria-label="Search">
+                    </form>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end align-items-center mx-4 mb-2">
+                <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">노래 추가</button>
+                <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">노래 삭제</button>
+            </div>
+            <div class="row d-flex justify-content-evenly align-items-start flex-nowrap my-4">
+                <div class="col-3 d-flex flex-wrap justify-content-center">
+                    <div class="row d-flex justify-content-center align-items-center rounded-3 mb-2" style="width: 300px; height: 300px; background-color: #5e5e5e;">
+                        <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/SvQ9DR-BVuk/sddefault.jpg}">
+                    </div>
+                    <div class="row d-flex justify-content-center">
+                        <button type="button" class="btn text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">이미지 변경</button>
+                    </div>
+                </div>
+                <div class="col-8 d-flex flex-wrap justify-content-end me-4">
+                    <div class="row w-100">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th scope="col">No</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Artist</th>
+                                <th scope="col">Album</th>
+                                <th scope="col">Youtube</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td><p class="rowColumn" contenteditable="true" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                                <td><button type="button" class="btn text-center" onclick="location.href='#'">수정</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                                <td><button type="button" class="btn text-center" onclick="location.href='#'">수정</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                                <td><button type="button" class="btn text-center" onclick="location.href='#'">수정</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">4</th>
+                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                                <td><button type="button" class="btn text-center" onclick="location.href='#'">수정</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">5</th>
+                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                                <td><button type="button" class="btn text-center" onclick="location.href='#'">수정</button></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">6</th>
+                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
+                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                                <td><button type="button" class="btn text-center" onclick="location.href='#'">수정</button></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <button type="button" class="btn text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">수정</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </main>
+</th:block>
+
+</html>

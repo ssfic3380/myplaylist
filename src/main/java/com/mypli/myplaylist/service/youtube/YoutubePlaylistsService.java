@@ -65,7 +65,7 @@ public class YoutubePlaylistsService {
             YouTube.Playlists.List playlistsRequest = youtube.playlists().list("snippet");
             playlistsRequest.setMine(true);
             playlistsRequest.setFields("nextPageToken," +
-                    "items(id,snippet/title,snippet/thumbnails/default/url)");
+                    "items(id,snippet/title,snippet/thumbnails/standard/url)");
 
             String nextToken = "";
             List<Playlist> playlistsList = new ArrayList<>();

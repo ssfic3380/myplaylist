@@ -42,6 +42,11 @@ public class PlaylistController {
     //TODO: model에 추가할 때 attributeName 어떻게 정할지 고민
     //TODO: 유튜브로 내보내기 구현
 
+    @GetMapping("")
+    public String test() {
+        return "playlist";
+    }
+
     /**
      * 플레이리스트 상세정보 페이지
      */
