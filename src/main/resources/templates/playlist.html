@@ -69,6 +69,93 @@
             </div>
         </div>
 
+        <!-- 노래 추가 모달 -->
+        <div class="modal fade" id="musicAddModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">노래 추가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="d-flex mb-1" style="height: 50px">
+                                <input type="text" class="form-control me-2 w-75" placeholder="검색어를 입력하세요">
+                                <button type="button" class="btn text-center text-white w-25" onclick="location.href='#'" style="background-color: #5e5e5e;">검색</button>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex align-items-center border-top border-bottom mb-1 py-1" style="cursor: pointer;"
+                                 data-bs-target="#musicAddSettingModal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                                <div class="flex-shrink-0">
+                                    <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                                </div>
+                                <div class="flex-grow-1 d-flex flex-column align-items-start justify-content-center ms-3">
+                                    <span class="addMusicTitle fw-bold fs-5 my-1">어쩔 수가 없나봐</span>
+                                    <span class="fs-6 my-1">김나영</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center border-top border-bottom mb-1 py-1" style="cursor: pointer;"
+                                 data-bs-target="#musicAddSettingModal" data-bs-toggle="modal" data-bs-dismiss="modal">
+                                <div class="flex-shrink-0">
+                                    <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                                </div>
+                                <div class="flex-grow-1 d-flex flex-column align-items-start justify-content-center ms-3">
+                                    <span class="addMusicTitle fw-bold fs-5 my-1">거미(GUMMY)&강승윤(KANG SEUNG YOON) 두 사람의 첫 듀엣곡 '널 사랑하지 않아'♬ | 비긴어게인 오픈마이크</span>
+                                    <span class="fs-6 my-1">Beginagain 비긴어게인</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!--<button type="button" class="btn btn-primary" onclick="location.href='#'">확인</button>-->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 노래 추가 세부설정 모달 -->
+        <div class="modal fade" id="musicAddSettingModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">노래 추가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex flex-wrap justify-content-center align-items-center">
+                        <div class="mb-2">
+                            <span class="fw-bold">*은 필수 입력 항목입니다.</span>
+                        </div>
+                        <div class="w-100">
+                            <div class="row form-group mb-1">
+                                <label for="musicTitle" class="col-2 col-form-label">제목*</label>
+                                <div class="col-10">
+                                    <input type="text" id="musicTitle" class="form-control" placeholder="널 사랑하지 않아">
+                                </div>
+                            </div>
+                            <div class="row form-group mb-1">
+                                <label for="musicArtist" class="col-2 col-form-label">가수*</label>
+                                <div class="col-10">
+                                    <input type="text" id="musicArtist" class="form-control" placeholder="어반 자카파">
+                                </div>
+                            </div>
+                            <div class="row form-group mb-1">
+                                <label for="musicAlbum" class="col-2 col-form-label">앨범명</label>
+                                <div class="col-10">
+                                    <input type="text" id="musicAlbum" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center justify-content-evenly">
+                        <button type="button" class="btn btn-primary w-100" onclick="location.href='#'">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 유튜브 URL 변경 모달 -->
         <div class="modal fade" id="urlUpdateModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -109,7 +196,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-end align-items-center mx-4 mb-2">
-                <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">노래 추가</button>
+                <button type="button" class="btn me-4 text-center text-white" data-bs-toggle="modal" data-bs-target="#musicAddModal" style="background-color: #5e5e5e;">노래 추가</button>
                 <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">노래 삭제</button>
             </div>
 
@@ -184,7 +271,6 @@
                         <button type="button" class="btn text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">저장</button>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
     </main>
