@@ -48,14 +48,13 @@ public class HomeController {
     public String showAllPlaylists(Principal principal, Model model) {
         //마플리 홈페이지 (유저의 모든 플레이리스트 보여주기)
 
-        String socialId = principal.getName();
+        String socialId = null;
+        if (principal != null) socialId = principal.getName();
+        //TODO: principal이 null이 되는 원인, null일 때 해결법 찾기
         List<Playlist> playlists = new ArrayList<>();
 
         if (socialId != null) playlists = playlistService.findBySocialId(socialId);
-        else {
-            //TODO: 로그인을 안했다면 플레이리스트가 없음
-        }
-        //TODO: 플레이리스트 이름, img만 보내주면 될듯? DTO로
+        model.addAttribute("playlistList", playlists);
 
         return "home";
     }
@@ -63,10 +62,10 @@ public class HomeController {
     /**
      * 메인페이지 - 플레이리스트 추가 (누르면 바로 새 플레이리스트의 상세페이지로 이동)
      */
-    @PostMapping("/playlist")
+    @PostMapping("/")
     public String createPlaylist(Principal principal,
                                  RedirectAttributes redirectAttributes) {
-        //"추가" 버튼을 클릭했을 경우 (팝업창 띄우기는 프론트에서 처리, 이 메서드는 GetMapping할 내용이 없어서 Post만 있음)
+        //"추가" 버튼을 클릭했을 경우
 
         String socialId = principal.getName();
 
@@ -93,7 +92,7 @@ public class HomeController {
         model.addAttribute("youtubePlaylists", youtubePlaylistResultList);
 
         //TODO: 프론트에서 띄운 유튜브 플레이리스트 목록 팝업창으로 return해야함 (아마 youtube 디렉토리에 importPopup이라는 이름으로 HTML 만들지 않을까?)
-        return "youtube/importPopup";
+        return "playlist";
     }
 
     @PostMapping("/youtube/playlists")

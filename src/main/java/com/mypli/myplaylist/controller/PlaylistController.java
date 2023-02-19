@@ -42,9 +42,17 @@ public class PlaylistController {
     //TODO: model에 추가할 때 attributeName 어떻게 정할지 고민
     //TODO: 유튜브로 내보내기 구현
 
-    @GetMapping("")
+    @GetMapping("/test")
     public String test() {
-        return "playlist";
+        YoutubePlaylistDto youtubePlaylistDto = YoutubePlaylistDto.builder()
+                .playlistId("PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK")
+                .title("비긴어게인")
+                .thumbnail("https://i.ytimg.com/vi/rHXZ7kA5Ayc/sddefault.jpg")
+                .build();
+        List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList = youtubePlaylistItemsService.getPlaylistItems("111511732184187189491", "PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK");
+        playlistService.importFromYoutube("111511732184187189491", youtubePlaylistDto, youtubePlaylistItemDtoList);
+
+        return "home";
     }
 
     /**
@@ -66,7 +74,7 @@ public class PlaylistController {
         model.addAttribute("playlist", playlistDto);
         model.addAttribute("musicList", musicList);
 
-        return "playlistDetail";
+        return "playlist";
     }
 
     @PutMapping("/{playlistId}")
