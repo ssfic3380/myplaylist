@@ -185,7 +185,7 @@
         <div class="container-fluid p-3">
             <div class="row mx-2 mt-2" style="height: 100px">
                 <div class="col-3 d-flex justify-content-center align-items-center p-2">
-                    <h1 class="text-center fw-bold" contenteditable="true" th:data-default="여행">여행</h1>
+                    <h1 class="text-center fw-bold" contenteditable="true" th:data-default="${playlist.playlistName}" th:text="${playlist.playlistName}">여행</h1>
                 </div>
                 <div class="col-9 d-flex justify-content-end align-items-center">
                     <button type="button" class="btn me-4 text-center text-white" data-bs-toggle="modal" data-bs-target="#playlistSaveModal" style="background-color: #5e5e5e;">유튜브로 내보내기</button>
@@ -203,7 +203,7 @@
             <div class="row d-flex justify-content-evenly align-items-start flex-nowrap my-4">
                 <div class="col-3 d-flex flex-wrap justify-content-center">
                     <div class="row d-flex justify-content-center align-items-center rounded-3 mb-2" style="width: 300px; height: 300px; background-color: #5e5e5e;">
-                        <img class="w-100 h-75" th:src="@{https://i.ytimg.com/vi/SvQ9DR-BVuk/sddefault.jpg}">
+                        <img class="w-100 h-75" th:src="@{${playlist.playlistImg}}">
                     </div>
                     <div class="row d-flex justify-content-center">
                         <button type="button" class="btn text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">이미지 변경</button>
@@ -222,46 +222,11 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td><p class="rowColumn" contenteditable="true" data-default="여행을 떠나요">여행을 떠나요</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
-                                <td><button type="button" class="btn btn-outline-dark text-center" data-bs-toggle="modal" data-bs-target="#urlUpdateModal">수정</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
-                                <td><button type="button" class="btn btn-outline-dark text-center" data-bs-toggle="modal" data-bs-target="#urlUpdateModal">수정</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">3</th>
-                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
-                                <td><button type="button" class="btn btn-outline-dark text-center" data-bs-toggle="modal" data-bs-target="#urlUpdateModal">수정</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">4</th>
-                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
-                                <td><button type="button" class="btn btn-outline-dark text-center" data-bs-toggle="modal" data-bs-target="#urlUpdateModal">수정</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
-                                <td><button type="button" class="btn btn-outline-dark text-center" data-bs-toggle="modal" data-bs-target="#urlUpdateModal">수정</button></td>
-                            </tr>
-                            <tr>
-                                <th scope="row">6</th>
-                                <td><p class="rowColumn" contenteditable="false" data-default="우리집 강아지는 복슬강아지">우리집 강아지는 복슬강아지</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="이승기">이승기</p></td>
-                                <td><p class="rowColumn" contenteditable="false" data-default="여행을 떠나요">여행을 떠나요</p></td>
+                            <tr th:each="music : ${musicList}">
+                                <th scope="row" th:text="${musicStat.count}">1</th>
+                                <td><p class="rowColumn" contenteditable="true" th:data-default="${music.title}" th:text="${music.title}">제목</p></td>
+                                <td><p class="rowColumn" contenteditable="true" th:data-default="${music.artist}" th:text="${music.artist}">가수</p></td>
+                                <td><p class="rowColumn" contenteditable="false" th:data-default="${music.album}" th:text="${music.album}">앨범</p></td>
                                 <td><button type="button" class="btn btn-outline-dark text-center" data-bs-toggle="modal" data-bs-target="#urlUpdateModal">수정</button></td>
                             </tr>
                             </tbody>
