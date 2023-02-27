@@ -1,4 +1,4 @@
-package com.mypli.myplaylist.controller.api;
+package com.mypli.myplaylist.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

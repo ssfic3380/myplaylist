@@ -52,7 +52,7 @@ public class AuthController {
 //        log.info("socialId = {}", socialId);
 
         redirectAttributes.addFlashAttribute("token", token);
-        return "redirect:/home";
+        return "redirect:/";
     }
 
     @GetMapping("/logout")
@@ -63,7 +63,7 @@ public class AuthController {
 
         CookieUtils.deleteCookie(request, response, "refresh-token");
 
-        return "redirect:/home";
+        return "redirect:/";
     }
 
     @GetMapping("/refresh")

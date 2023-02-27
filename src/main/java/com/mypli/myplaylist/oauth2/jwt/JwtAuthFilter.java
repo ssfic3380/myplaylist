@@ -1,7 +1,7 @@
 package com.mypli.myplaylist.oauth2.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mypli.myplaylist.controller.api.ApiResponseHeader;
+import com.mypli.myplaylist.api.response.ApiResponseHeader;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.repository.MemberRepository;
@@ -21,7 +21,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +37,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         //1. Request Header의 "Authorization: Bearer "에서 Access Token을 꺼낸다.
         //String accessToken = HeaderUtils.getAccessToken(request);
-        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc2OTYwMTQ0fQ.zCGbHAp_bXMG2Atf5N0RiS0JMFr6nizQRE9LEnaxsKuUei0ZU4gFB6QQFbXmlIau-jA-YQnF8nnnfQMcHfeDJA";
+        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc3NDk5NTA4fQ.LMEigwEKIZeM7gPaJzS2Qtw4nkk3D7dVj1uLFIDWfcDFK4MczUZdRTz3-CQ55RdCPBtcGrHTTxcxECrjoB-Z8w";
         String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
                 .orElse((null));
@@ -109,8 +108,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
 
         try {
-        String json = new ObjectMapper().writeValueAsString(new ApiResponseHeader(status.value(), msg));
-        response.getWriter().write(json);
+            String json = new ObjectMapper().writeValueAsString(new ApiResponseHeader(status.value(), msg));
+            response.getWriter().write(json);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

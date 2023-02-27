@@ -35,9 +35,9 @@ public class PlaylistController {
 
     private final PlaylistService playlistService;
     private final MusicService musicService;
-    private final YoutubePlaylistsService youtubePlaylistsService;
+
     private final YoutubePlaylistItemsService youtubePlaylistItemsService;
-    private final YoutubeSearchService youtubeSearchService;
+
 
     //TODO: model에 추가할 때 attributeName 어떻게 정할지 고민
     //TODO: 유튜브로 내보내기 구현
@@ -83,41 +83,6 @@ public class PlaylistController {
         //TODO: PlaylistName, 그리고 Playlist가 가진 Music들의 변경점을 반영해야함 (이거 카카오오븐에 쎠놨던거 참고)
 
         return "playlistDetail";
-    }
-
-    /**
-     * 플레이리스트 상세정보 페이지 - 노래 추가
-     * List는 비어있을 수 있음
-     */
-    @GetMapping("/search")
-    public String openYoutubeSearchPopup(@RequestParam(value = "q", required = false) String searchQuery,
-                                         Model model) {
-
-        List<YoutubeSearchDto> youtubeSearchResultList = new ArrayList<>();
-        if (searchQuery != null) youtubeSearchResultList = youtubeSearchService.getSearchResult(searchQuery);
-
-        model.addAttribute("youtubeSearchResults", youtubeSearchResultList);
-
-        return "youtube/searchPopup";
-    }
-
-    @PostMapping("/search")
-    public String getYoutubeItems(@ModelAttribute("youtubeSearchResult") YoutubeSearchDto youtubeSearchDto,
-                                  Model model) {
-        //TODO: 선택한 youtubeItem을 Music에 추가하려고 하는데, playlistId가 필요함
-
-
-
-        /*MusicDto musicDto = MusicDto.builder()
-                .title(youtubeSearchDto.getTitle())
-                .artist(youtubeSearchDto.getChannelTitle())
-                .videoId(youtubeSearchDto.getVideoId())
-                .musicImg(youtubeSearchDto.getThumbnail())
-                .musicOrder();
-        musicService.create();*/
-
-        //TODO: 여기서 리턴을 하면 팝업창에 대해서 렌더링을 할텐데, 플레이리스트 페이지를 새로고침하려면 어떻게 해야할지?
-        return "youtube/searchPopup";
     }
 
     /**
