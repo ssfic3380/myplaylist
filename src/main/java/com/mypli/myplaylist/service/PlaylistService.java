@@ -6,9 +6,7 @@ import com.mypli.myplaylist.domain.Playlist;
 import com.mypli.myplaylist.dto.PlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
-import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.exception.PlaylistNotFoundException;
-import com.mypli.myplaylist.repository.MemberRepository;
 import com.mypli.myplaylist.repository.MusicRepository;
 import com.mypli.myplaylist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PlaylistService {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final PlaylistRepository playlistRepository;
     private final MusicRepository musicRepository;
 
@@ -34,7 +30,7 @@ public class PlaylistService {
     @Transactional
     public Long create(String socialId, PlaylistDto playlistDto) {
 
-        Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
+        Member member = memberService.findBySocialId(socialId);
 
         if (playlistDto.getPlaylistImg() == null) {
             //TODO: 이미지가 없을 때, 기본 이미지를 넣어줘야 함
@@ -67,7 +63,7 @@ public class PlaylistService {
     @Transactional
     public Long importFromYoutube(String socialId, YoutubePlaylistDto youtubePlaylistDto, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
 
-        Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
+        Member member = memberService.findBySocialId(socialId);
 
         Playlist newPlaylist = Playlist.createPlaylist(member, youtubePlaylistDto.getTitle(), youtubePlaylistDto.getThumbnail());
 

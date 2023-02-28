@@ -58,12 +58,11 @@ public class CustomOidcUserService extends OidcUserService {
         OAuth2Attributes attributes = OAuth2Attributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         //4. DB에 User 정보를 저장하거나, 바뀐 정보를 업데이트한다. (회원 가입)
-        Member member = memberRepository.findBySocialId(attributes.getOauthId()).orElseThrow(MemberNotFoundException::new);
-        if(member != null) {
-            member = updateMember(member, attributes, accessToken, refreshToken);
-        }
-        else {
-            member = registerMember(attributes, accessToken, refreshToken);
+        try {
+            Member member = memberRepository.findBySocialId(attributes.getOauthId()).orElseThrow(MemberNotFoundException::new);
+            updateMember(member, attributes, accessToken, refreshToken);
+        } catch(MemberNotFoundException e) {
+            registerMember(attributes, accessToken, refreshToken);
         }
 
         //5. 권한을 ROLE_USER로 설정하고, SuccessHandler 혹은 FailureHandler가 사용할 수 있도록 등록한다.

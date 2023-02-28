@@ -12,10 +12,13 @@
     <link rel="stylesheet" href="/css/bootstrap.css">
 
     <script src="/js/bootstrap.js"></script>
-    <script th:src="@{/js/sidebars.js}"></script>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <script th:inline="javascript">
+    <script defer th:src="@{/js/home.js}"></script>
+    <script defer th:src="@{/js/playlist.js}"></script>
+    <script defer th:src="@{/js/sidebar.js}"></script>
+    <script defer th:inline="javascript">
 
+        /* 사이드바 - 유튜브 플레이어 */
         var yPlayer;
 
         // 1. This code loads the IFrame Player API code asynchronously.
@@ -58,13 +61,18 @@
                 done = true;
             }
         }
+
         function stopVideo() {
-            player.stopVideo();
+            yPlayer.stopVideo();
         }
+
     </script>
 
     <!-- content script -->
-    <th:block layout:fragment="css"></th:block>
+    <!--<th:block layout:fragment="css"></th:block>-->
+
+    <!-- content script -->
+    <!--<th:block layout:fragment="script"></th:block>-->
 </head>
 
 <body>
@@ -76,9 +84,6 @@
     <th:block layout:fragment="content"></th:block>
     <!-- footer fragment 사용 -->
     <!--<th:block th:replace="fragments/footer :: footerFragment"></th:block>-->
-
-    <!-- content script -->
-    <th:block layout:fragment="script"></th:block>
 </body>
 
 </html>

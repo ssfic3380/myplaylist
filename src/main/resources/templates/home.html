@@ -32,7 +32,8 @@
             </div>
             <div class="row d-flex flex-wrap justify-content-start align-content-start px-2 m-4" th:each="playlist : ${playlistList}">
                 <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e; cursor: pointer;"
-                th:onclick="|location.href='@{/playlist/{param1}(param1=${playlist.id})}'|">
+                     th:onclick="|getPlaylistPage(${playlist.id})|">
+                <!--th:onclick="|location.href='@{/playlist/{param1}(param1=${playlist.id})}'|">-->
                     <img class="w-100 h-75" th:src="@{${playlist.playlistImg}}">
                     <p class="text-center text-white fw-bold" th:text="${playlist.playlistName}">이름</p>
                 </div>

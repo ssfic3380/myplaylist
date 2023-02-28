@@ -22,6 +22,7 @@ public class YoutubeTestController {
     private final YoutubePlaylistsService youtubePlaylistService;
     private final YoutubePlaylistItemsService youtubePlaylistItemsService;
     private final YoutubeSearchService youtubeSearchService;
+    private final PlaylistService playlistService;
 
     @GetMapping("youtube1")
     public List<YoutubePlaylistDto> playlist_list() {
@@ -35,7 +36,22 @@ public class YoutubeTestController {
 
     @GetMapping("youtube3")
     public List<YoutubeSearchDto> search() {
-        return youtubeSearchService.getSearchResult("어떻게 이별까지 사랑하겠어");
+        return youtubeSearchService.getSearchResult("111511732184187189491", "어떻게 이별까지 사랑하겠어");
+    }
+
+    @GetMapping("test")
+    public String test() {
+        // 111511 쟤한테 플레이리스트 강제 저장
+        
+        YoutubePlaylistDto youtubePlaylistDto = YoutubePlaylistDto.builder()
+                .playlistId("PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK")
+                .title("비긴어게인")
+                .thumbnail("https://i.ytimg.com/vi/rHXZ7kA5Ayc/sddefault.jpg")
+                .build();
+        List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList = youtubePlaylistItemsService.getPlaylistItems("111511732184187189491", "PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK");
+        playlistService.importFromYoutube("111511732184187189491", youtubePlaylistDto, youtubePlaylistItemDtoList);
+
+        return "home";
     }
 
 }

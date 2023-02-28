@@ -2,7 +2,6 @@ package com.mypli.myplaylist.service;
 
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.exception.MemberNotFoundException;
-import com.mypli.myplaylist.repository.MemberProfileRepository;
 import com.mypli.myplaylist.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service

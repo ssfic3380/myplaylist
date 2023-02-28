@@ -1,6 +1,5 @@
 package com.mypli.myplaylist.oauth2.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.MemberProfile;
 import com.mypli.myplaylist.domain.Role;
@@ -14,10 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2RefreshToken;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -66,12 +62,11 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
         //log.info("attributes = {}", new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(attributes));
 
         //4. DB에 User 정보를 저장하거나, 바뀐 정보를 업데이트한다. (회원 가입)
-        Member member = memberRepository.findBySocialId(attributes.getOauthId()).orElseThrow(MemberNotFoundException::new);
-        if(member != null) {
-            member = updateMember(member, attributes, accessToken, refreshToken);
-        }
-        else {
-            member = registerMember(attributes, accessToken, refreshToken);
+        try {
+            Member member = memberRepository.findBySocialId(attributes.getOauthId()).orElseThrow(MemberNotFoundException::new);
+            updateMember(member, attributes, accessToken, refreshToken);
+        } catch(MemberNotFoundException e) {
+            registerMember(attributes, accessToken, refreshToken);
         }
 
         //5. 권한을 ROLE_USER로 설정하고, SuccessHandler 혹은 FailureHandler가 사용할 수 있도록 등록한다.
@@ -102,5 +97,4 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
 
         return memberRepository.save(member);
     }
-
 }

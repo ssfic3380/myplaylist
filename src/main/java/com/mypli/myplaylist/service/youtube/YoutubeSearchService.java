@@ -32,7 +32,7 @@ public class YoutubeSearchService {
     @Value("${app.youtube.apiKey}")
     private String apiKey;
 
-    public List<YoutubeSearchDto> getSearchResult(String queryTerm) {
+    public List<YoutubeSearchDto> getSearchResult(String socialId, String queryTerm) {
 
         List<YoutubeSearchDto> youtubeSearchDtoList = new ArrayList<>();
 
@@ -42,6 +42,8 @@ public class YoutubeSearchService {
                 public void initialize(HttpRequest request) throws IOException {
                 }
             }).setApplicationName("my-playlist").build();
+
+            log.info("[{}] Fetching Youtube Search Results (Query: \"{}\")", socialId, queryTerm);
 
             YouTube.Search.List search = youtube.search().list("id,snippet");
             search.setKey(apiKey);

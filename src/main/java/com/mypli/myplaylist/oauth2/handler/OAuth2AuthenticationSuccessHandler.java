@@ -5,20 +5,12 @@ import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.oauth2.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.mypli.myplaylist.oauth2.jwt.JwtToken;
 import com.mypli.myplaylist.oauth2.jwt.JwtTokenProvider;
-import com.mypli.myplaylist.oauth2.userdetails.UserDetailsImpl;
-import com.mypli.myplaylist.repository.MemberRepository;
+import com.mypli.myplaylist.service.MemberService;
 import com.mypli.myplaylist.utils.CookieUtils;
-import com.mypli.myplaylist.utils.HeaderUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +32,7 @@ import static com.mypli.myplaylist.oauth2.cookie.HttpCookieOAuth2AuthorizationRe
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final JwtTokenProvider tokenProvider;
     private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
@@ -84,7 +76,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         //3-1. Member 엔티티에 RefreshToken 입력
         String socialId = authentication.getName();
-        Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
+        Member member = memberService.findBySocialId(socialId);
         updateMemberRefreshToken(member, token.getRefreshToken());
 
         //3-2. Cookie에 RefreshToken 추가

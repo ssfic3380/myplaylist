@@ -12,14 +12,12 @@ import com.mypli.myplaylist.oauth2.service.CustomOAuth2AuthService;
 import com.mypli.myplaylist.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import com.mypli.myplaylist.oauth2.handler.OAuth2AuthenticationSuccessHandler;
 import com.mypli.myplaylist.oauth2.service.CustomOidcUserService;
-import com.mypli.myplaylist.repository.MemberRepository;
+import com.mypli.myplaylist.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -54,7 +52,7 @@ public class SecurityConfig {
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
     private final JwtTokenProvider tokenProvider;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -124,7 +122,7 @@ public class SecurityConfig {
                     .successHandler(oAuth2AuthenticationSuccessHandler)
                     .failureHandler(oAuth2AuthenticationFailureHandler);
 
-        http.addFilterBefore(new JwtAuthFilter(tokenProvider, memberRepository), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthFilter(tokenProvider, memberService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

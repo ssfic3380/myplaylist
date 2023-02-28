@@ -45,7 +45,8 @@ public class HomeController {
      * 메인페이지
      */
     @GetMapping("/")
-    public String showAllPlaylists(Principal principal, Model model) {
+    public String showAllPlaylists(@RequestParam(value = "refresh", required = false) String refresh,
+                                   Principal principal, Model model) {
         //마플리 홈페이지 (유저의 모든 플레이리스트 보여주기)
 
         if (principal == null) return "redirect:/oauth2/login"; //TODO: 일단 RefreshToken 만료시 무조건 다시 로그인
@@ -54,11 +55,11 @@ public class HomeController {
         if (principal != null) socialId = principal.getName(); //TODO: 하지만 비로그인을 위해서 조금 고민해봐야 함
 
         List<Playlist> playlists = new ArrayList<>();
-
         if (socialId != null) playlists = playlistService.findBySocialId(socialId);
         model.addAttribute("playlistList", playlists);
 
-        return "home";
+        if (refresh != null && refresh.equals("true")) return "home :: main";
+        else return "home";
     }
 
     /**

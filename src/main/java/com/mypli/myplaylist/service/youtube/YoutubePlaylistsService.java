@@ -13,8 +13,7 @@ import com.google.api.services.youtube.model.*;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.dto.PlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
-import com.mypli.myplaylist.exception.MemberNotFoundException;
-import com.mypli.myplaylist.repository.MemberRepository;
+import com.mypli.myplaylist.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class YoutubePlaylistsService {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
@@ -46,7 +45,7 @@ public class YoutubePlaylistsService {
 
         try {
 
-            Member member = memberRepository.findBySocialId(socialId).orElseThrow(MemberNotFoundException::new);
+            Member member = memberService.findBySocialId(socialId);
             String accessToken = "";
             String refreshToken = "";
             if (member != null) {
@@ -56,6 +55,8 @@ public class YoutubePlaylistsService {
                 log.error("Cannot find member from JwtAccessToken");
                 return youtubePlaylistDtoList;
             }
+
+            log.info("[{}] Fetching Youtube Playlists", socialId);
 
             Credential credential = authorize(accessToken, refreshToken);
 
@@ -155,7 +156,7 @@ public class YoutubePlaylistsService {
 
         try {
 
-            Member member = memberRepository.findBySocialId(socialId);
+            Member member = memberService.findBySocialId(socialId);
             String accessToken = "";
             if(member != null) accessToken = member.getSocialAccessToken();
             else {

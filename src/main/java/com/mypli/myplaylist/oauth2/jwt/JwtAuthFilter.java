@@ -3,8 +3,7 @@ package com.mypli.myplaylist.oauth2.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mypli.myplaylist.api.response.ApiResponseHeader;
 import com.mypli.myplaylist.domain.Member;
-import com.mypli.myplaylist.exception.MemberNotFoundException;
-import com.mypli.myplaylist.repository.MemberRepository;
+import com.mypli.myplaylist.service.MemberService;
 import com.mypli.myplaylist.utils.CookieUtils;
 import com.mypli.myplaylist.utils.HeaderUtils;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     private final static String REFRESH_TOKEN = "refresh-token";
     private final int COOKIE_PERIOD = 60 * 60 * 24; //하루
@@ -37,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         //1. Request Header의 "Authorization: Bearer "에서 Access Token을 꺼낸다.
         //String accessToken = HeaderUtils.getAccessToken(request);
-        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc3NDk5NTA4fQ.LMEigwEKIZeM7gPaJzS2Qtw4nkk3D7dVj1uLFIDWfcDFK4MczUZdRTz3-CQ55RdCPBtcGrHTTxcxECrjoB-Z8w";
+        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc3NTc1NDk3fQ.B3QkGuJuzv8FdLJOM2qx7wMTJ43h5mBOUgB1xFoZw0oLApnWwBCInmzzT53mV3l0tilcT5Y6k-RGtjlb6EZIWw";
         String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
                 .orElse((null));
@@ -63,7 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if (tokenProvider.validateToken(refreshToken)) { //RefreshToken은 일단 정상
 
                     String oauthId = tokenProvider.parseClaims(accessToken).getSubject();
-                    Member member = memberRepository.findBySocialId(oauthId).orElseThrow(MemberNotFoundException::new);
+                    Member member = memberService.findBySocialId(oauthId);
 
                     if (compareWithDB(refreshToken, member)) { //DB의 RefreshToken과도 같으면
                         JwtToken newToken = tokenProvider.renewToken(accessToken, refreshToken); //accessToken 재발급, refreshToken 3일 이하시 재발급

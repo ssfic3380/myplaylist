@@ -42,24 +42,13 @@ public class PlaylistController {
     //TODO: model에 추가할 때 attributeName 어떻게 정할지 고민
     //TODO: 유튜브로 내보내기 구현
 
-    @GetMapping("/test")
-    public String test() {
-        YoutubePlaylistDto youtubePlaylistDto = YoutubePlaylistDto.builder()
-                .playlistId("PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK")
-                .title("비긴어게인")
-                .thumbnail("https://i.ytimg.com/vi/rHXZ7kA5Ayc/sddefault.jpg")
-                .build();
-        List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList = youtubePlaylistItemsService.getPlaylistItems("111511732184187189491", "PL1DG6X8jmc76tqriNylTHfqDZVRDAyYgK");
-        playlistService.importFromYoutube("111511732184187189491", youtubePlaylistDto, youtubePlaylistItemDtoList);
-
-        return "home";
-    }
-
     /**
      * 플레이리스트 상세정보 페이지
      */
     @GetMapping("/{playlistId}")
-    public String getPlaylist(@PathVariable String playlistId, Model model) {
+    public String getPlaylist(@PathVariable String playlistId, Principal principal, Model model) {
+
+        if (principal == null) return "redirect:/oauth2/login";
 
         Playlist playlist = playlistService.findById(playlistId);
 
@@ -74,9 +63,12 @@ public class PlaylistController {
         model.addAttribute("playlist", playlistDto);
         model.addAttribute("musicList", musicList);
 
-        return "playlist";
+        return "playlist :: main";
     }
 
+    /**
+     * 플레이리스트 상세정보 페이지 - 변경사항 저장 (렌더링 필요 없이 저장만 하는거라서 API로 넘겨야 할듯?)
+     */
     @PutMapping("/{playlistId}")
     public String updatePlaylist(@PathVariable String playlistId) {
         //TODO: PatchMapping도 생각해보자 (부분 덮어쓰기)
