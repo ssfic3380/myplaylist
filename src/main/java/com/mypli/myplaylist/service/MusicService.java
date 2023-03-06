@@ -1,9 +1,12 @@
 package com.mypli.myplaylist.service;
 
+import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
+import com.mypli.myplaylist.dto.CreateMusicDto;
 import com.mypli.myplaylist.dto.MusicDto;
 import com.mypli.myplaylist.exception.MusicNotFoundException;
+import com.mypli.myplaylist.exception.NoPermissionException;
 import com.mypli.myplaylist.exception.PlaylistNotFoundException;
 import com.mypli.myplaylist.repository.MusicRepository;
 import com.mypli.myplaylist.repository.PlaylistRepository;
@@ -21,25 +24,30 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MusicService {
 
-    private final PlaylistRepository playlistRepository;
     private final MusicRepository musicRepository;
+    private final MemberService memberService;
+    private final PlaylistService playlistService;
 
     //==생성==//
     /**
      * 노래 생성
      */
     @Transactional
-    public Long create(Long playlistId, MusicDto musicDto) {
+    public Long create(String socialId, CreateMusicDto createMusicDto) {
 
-        Playlist playlist = playlistRepository.findById(playlistId).orElseThrow(PlaylistNotFoundException::new);
+        // 1. 권한 체크
+        Member member = memberService.findBySocialId(socialId);
+        Playlist playlist = playlistService.findById(createMusicDto.getPlaylistId());
+        checkAuthority(member, playlist); // TODO: 404 NOT FOUND가 날아가고, errorMessage가 NoPermission인지 확인
 
-        Music newMusic = Music.createMusic(playlist,
-                musicDto.getTitle(),
-                musicDto.getArtist(),
-                musicDto.getAlbum(),
-                musicDto.getVideoId(),
-                musicDto.getMusicImg(),
-                musicDto.getMusicOrder());
+        Music newMusic = Music.createMusic(
+                playlist,
+                createMusicDto.getTitle(),
+                createMusicDto.getArtist(),
+                createMusicDto.getAlbum(),
+                createMusicDto.getVideoId(),
+                createMusicDto.getMusicImg(),
+                createMusicDto.getMusicOrder());
 
         return musicRepository.save(newMusic).getId();
     }
@@ -81,6 +89,14 @@ public class MusicService {
         return musicRepository.findByArtist(album);
     }
 
+    /**
+     * "노래 아이디"로 플레이리스트 아이디 조회(1개)
+     */
+    public Long findPlaylistIdById(Long musicId) {
+        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        return music.getPlaylist().getId();
+    }
+
 
     //==변경==//
     /**
@@ -88,8 +104,8 @@ public class MusicService {
      */
     @Transactional
     public Long[] exchangeOrder(Long musicId1, Long musicId2) {
-        Music music1 = musicRepository.findById(musicId1).orElseThrow(MusicNotFoundException::new);
-        Music music2 = musicRepository.findById(musicId2).orElseThrow(MusicNotFoundException::new);
+        Music music1 = findById(musicId1);
+        Music music2 = findById(musicId2);
 
         Long temp = music1.getMusicOrder();
         music1.updateMusicOrder(music2.getMusicOrder());
@@ -103,7 +119,7 @@ public class MusicService {
      */
     @Transactional
     public Long updateOrderById(Long musicId, Long newOrder) {
-        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        Music music = findById(musicId);
         music.updateMusicOrder(newOrder);
 
         return music.getId();
@@ -114,7 +130,7 @@ public class MusicService {
      */
     @Transactional
     public Long updateTitleById(Long musicId, String newTitle) {
-        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        Music music = findById(musicId);
         music.updateTitle(newTitle);
 
         return music.getId();
@@ -125,7 +141,7 @@ public class MusicService {
      */
     @Transactional
     public Long updateArtistById(Long musicId, String newArtist) {
-        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        Music music = findById(musicId);
         music.updateArtist(newArtist);
 
         return music.getId();
@@ -136,7 +152,7 @@ public class MusicService {
      */
     @Transactional
     public Long updateAlbumById(Long musicId, String newAlbum) {
-        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        Music music = findById(musicId);
         music.updateAlbum(newAlbum);
 
         return music.getId();
@@ -147,7 +163,7 @@ public class MusicService {
      */
     @Transactional
     public Long updateVideoIdById(Long musicId, String newVideoId) {
-        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        Music music = findById(musicId);
         music.updateVideoId(newVideoId);
 
         return music.getId();
@@ -158,7 +174,7 @@ public class MusicService {
      */
     @Transactional
     public Long updateImgById(Long musicId, String newImg) {
-        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        Music music = findById(musicId);
         music.updateMusicImg(newImg);
 
         return music.getId();
@@ -171,8 +187,14 @@ public class MusicService {
      */
     @Transactional
     public void deleteById(Long musicId) {
-        Music music = musicRepository.findById(musicId).orElseThrow(MusicNotFoundException::new);
+        Music music = findById(musicId);
         music.deleteMusic();
         musicRepository.deleteById(musicId);
+    }
+
+
+    //==권한 체크==//
+    private void checkAuthority(Member member, Playlist playlist) {
+        if (member.getId() != playlist.getMember().getId()) throw new NoPermissionException();
     }
 }

@@ -3,11 +3,13 @@ package com.mypli.myplaylist.service;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
+import com.mypli.myplaylist.dto.CreateMusicDto;
+import com.mypli.myplaylist.dto.MusicDto;
 import com.mypli.myplaylist.dto.PlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
+import com.mypli.myplaylist.exception.NoPermissionException;
 import com.mypli.myplaylist.exception.PlaylistNotFoundException;
-import com.mypli.myplaylist.repository.MusicRepository;
 import com.mypli.myplaylist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaylistService {
 
-    private final MemberService memberService;
     private final PlaylistRepository playlistRepository;
-    private final MusicRepository musicRepository;
+    private final MemberService memberService;
 
     //==생성==//
     @Transactional
@@ -99,8 +100,8 @@ public class PlaylistService {
     /**
      * "플레이리스트 아이디"로 조회(1개)
      */
-    public Playlist findById(String playlistId) {
-        return playlistRepository.findById(Long.parseLong(playlistId)).orElseThrow(PlaylistNotFoundException::new);
+    public Playlist findById(Long playlistId) {
+        return playlistRepository.findById(playlistId).orElseThrow(PlaylistNotFoundException::new);
     }
 
     /**

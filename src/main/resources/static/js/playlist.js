@@ -20,7 +20,7 @@ $(document).on('click', '.btn-videoId-modal', function() {
 
 /* 노래 추가 모달 */
 // 모달 창 종료시 검색 결과 삭제
-$('#musicAddModal').on('hidden.bs.modal', function(e) {
+$(document).on('hidden.bs.modal', '#musicAddModal', function(e) {
     $(this).find('#youtubeSearchQuery')[0].value = null;
     $(this).find('#youtubeSearchResult')[0].replaceChildren();
 });
@@ -114,7 +114,6 @@ function getYoutubeSearchList() {
 
 /* 노래 추가 세부설정 모달 */
 // 모달 창 초기값 설정 (동적으로 생성된 페이지의 이벤트는 .on()을 사용해야 한다)
-
 $(document).on('click', '.music', function() {
     // form 전송용
     var videoId = $(this).data('video-id');
@@ -124,11 +123,42 @@ $(document).on('click', '.music', function() {
     var title = $(this).children().children(".addMusicTitle").data('title');
     var artist = $(this).children().children(".addMusicArtist").data('artist');
 
+    $("#musicVideoId").val(videoId);
+    $("#musicThumbnail").val(thumbnail);
     $("#musicTitle").val(title);
     $("#musicArtist").val(artist);
 })
 
-// 모달 창 종료시 검색 결과 삭제
-$('#musicAddSettingModal').on('hidden.bs.modal', function(e) {
+// 확인 버튼 클릭시
+function postAddMusic() {
+    var params = {
+        title : $("#musicTitle").val(),
+        artist : $("#musicArtist").val(),
+        album : $("#musicAlbum").val(),
+        videoId : $("#musicVideoId").val(),
+        musicImg : $("#musicThumbnail").val(),
+        musicOrder : $("#musicListTableBody").children().last().children('th').data('music-order') + 1,
+        playlistId : $("#playlistId").val()
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "/playlist/search",
+        data: params,
+        dataType: "text"
+    })
+        .done(function (result) {
+            $("#musicListDiv").replaceWith(result);
+        })
+        .fail(function (jqXHR) {
+            console.log(jqXHR);
+        })
+        .always(function() {
+
+        })
+}
+
+// 모달 창 종료시 이전 입력 기록 삭제
+$(document).on('hidden.bs.modal', '#musicAddSettingModal', function(e) {
     $(this).find('form')[0].reset();
 });

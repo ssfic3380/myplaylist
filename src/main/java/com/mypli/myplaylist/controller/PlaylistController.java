@@ -2,18 +2,11 @@ package com.mypli.myplaylist.controller;
 
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
-import com.mypli.myplaylist.dto.MusicDto;
+import com.mypli.myplaylist.dto.CreateMusicDto;
 import com.mypli.myplaylist.dto.PlaylistDto;
-import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
-import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
-import com.mypli.myplaylist.dto.youtube.YoutubeSearchDto;
-import com.mypli.myplaylist.exception.MusicNotFoundException;
-import com.mypli.myplaylist.exception.PlaylistNotFoundException;
 import com.mypli.myplaylist.service.MusicService;
 import com.mypli.myplaylist.service.PlaylistService;
 import com.mypli.myplaylist.service.youtube.YoutubePlaylistItemsService;
-import com.mypli.myplaylist.service.youtube.YoutubePlaylistsService;
-import com.mypli.myplaylist.service.youtube.YoutubeSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -22,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -46,7 +36,7 @@ public class PlaylistController {
      * 플레이리스트 상세정보 페이지
      */
     @GetMapping("/{playlistId}")
-    public String getPlaylist(@PathVariable String playlistId, Principal principal, Model model) {
+    public String getPlaylist(@PathVariable Long playlistId, Principal principal, Model model) {
 
         if (principal == null) return "redirect:/oauth2/login";
 
@@ -67,7 +57,7 @@ public class PlaylistController {
     }
 
     /**
-     * 플레이리스트 상세정보 페이지 - 변경사항 저장 (렌더링 필요 없이 저장만 하는거라서 API로 넘겨야 할듯?)
+     * 플레이리스트 상세정보 페이지 - 변경사항 저장 (렌더링용 html 만들고 거기에 model넣어서 ajax로 일부 교체)
      */
     @PutMapping("/{playlistId}")
     public String updatePlaylist(@PathVariable String playlistId) {
@@ -92,5 +82,26 @@ public class PlaylistController {
         redirectAttributes.addAttribute("playlistId", playlistId);
 
         return "redirect:/{playlistId}";
+    }
+
+    /**
+     * 노래 추가 세부설정 모달 - 노래 추가
+     */
+    @PostMapping("/search")
+    public String addMusic(@ModelAttribute CreateMusicDto createMusicDto, Principal principal, Model model) {
+
+        //socialId는 권한 체크용
+        String socialId = "";
+        if (principal == null) return "redirect:/oauth2/login";
+        else socialId = principal.getName();
+
+        Long newMusicId = musicService.create(socialId, createMusicDto);
+        Long playlistId = musicService.findPlaylistIdById(newMusicId);
+
+        List<Music> musicList = musicService.findByPlaylistId(playlistId);
+
+        model.addAttribute("musicList", musicList);
+
+        return "fragments/playlistTable";
     }
 }

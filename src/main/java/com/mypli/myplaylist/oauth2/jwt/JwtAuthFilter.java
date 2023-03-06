@@ -36,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         //1. Request Header의 "Authorization: Bearer "에서 Access Token을 꺼낸다.
         //String accessToken = HeaderUtils.getAccessToken(request);
-        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc3NTc1NDk3fQ.B3QkGuJuzv8FdLJOM2qx7wMTJ43h5mBOUgB1xFoZw0oLApnWwBCInmzzT53mV3l0tilcT5Y6k-RGtjlb6EZIWw";
+        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc4MTE2MTUyfQ.4s_As1HzDA-tJ2vcIO1uW9ggE2fmZUZqZlHhVKA2MJHuHomgpfqKOiIYlKfU64W_xtB-IFrWEUiOFUpSlLFXzA";
         String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
                 .orElse((null));
@@ -86,7 +86,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     else { //RefreshToken이 만료됐거나, DB와 일치하지 않을 경우
                         //setErrorResponse(response, HttpStatus.BAD_REQUEST, "Refresh Token Expired");
                         log.error("Refresh Token Expired");
-                        response.sendRedirect("/oauth2/login");
+                        response.sendRedirect("/oauth2/login"); //TODO: 여기서 이러면 여러번 리다이렉트했습니다 뜨는듯?
                         return;
                     }
                 }

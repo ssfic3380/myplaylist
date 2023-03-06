@@ -41,24 +41,4 @@ public class PlaylistApiController {
 
         return ApiResponse.success("data", youtubeSearchResultList);
     }
-
-    /**
-     * 노래 추가 세부설정 모달 - 노래 추가 API
-     */
-    @PostMapping("/search")
-    public ApiResponse insertYoutubeItem(@ModelAttribute("youtubeSearchResult") YoutubeSearchDto youtubeSearchDto,
-                                       Model model) {
-        //TODO: 선택한 youtubeItem을 Music에 추가하려고 하는데, playlistId가 필요함: 모달창으로 띄웠으니까 가져올 수 있을듯
-
-        /*MusicDto musicDto = MusicDto.builder()
-                .title(youtubeSearchDto.getTitle())
-                .artist(youtubeSearchDto.getChannelTitle())
-                .videoId(youtubeSearchDto.getVideoId())
-                .musicImg(youtubeSearchDto.getThumbnail())
-                .musicOrder();
-        musicService.create();*/
-
-        //TODO: 여기서 리턴을 하면 팝업창에 대해서 렌더링을 할텐데, 플레이리스트 페이지를 새로고침하려면 어떻게 해야할지?
-        return ApiResponse.OK();
-    }
 }
