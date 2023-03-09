@@ -18,6 +18,33 @@ $(document).on('click', '.btn-videoId-modal', function() {
 });
 
 
+/* 플레이리스트 페이지 - 현재 플레이리스트 변경 */
+document.write('<script src="/js/sidebar.js"></script>');
+function changePlaylist() {
+    var params = {
+        playlistId : $("#playlistId").val()
+    }
+
+    $.ajax({
+        type: "GET",
+        url: "/playlist/current",
+        data: params,
+        dataType: "text"
+    })
+        .done(function (result) {
+            $("aside").empty();
+            $("aside").replaceWith(result);
+            loadYoutubeApi();
+        })
+        .fail(function (jqXHR) {
+            console.log(jqXHR);
+        })
+        .always(function() {
+
+        })
+}
+
+
 /* 노래 추가 모달 */
 // 모달 창 종료시 검색 결과 삭제
 $(document).on('hidden.bs.modal', '#musicAddModal', function(e) {

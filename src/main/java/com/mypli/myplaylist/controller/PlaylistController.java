@@ -25,11 +25,8 @@ public class PlaylistController {
 
     private final PlaylistService playlistService;
     private final MusicService musicService;
-
     private final YoutubePlaylistItemsService youtubePlaylistItemsService;
 
-
-    //TODO: model에 추가할 때 attributeName 어떻게 정할지 고민
     //TODO: 유튜브로 내보내기 구현
 
     /**
@@ -103,5 +100,29 @@ public class PlaylistController {
         model.addAttribute("musicList", musicList);
 
         return "fragments/playlistTable";
+    }
+
+    /**
+     * 플레이리스트 상세정보 페이지 - 현재 재생중인 플레이리스트 변경
+     */
+    @GetMapping("/current")
+    public String changePlaylist(@RequestParam Long playlistId, Model model) {
+
+        log.info("{}", playlistId);
+
+        Playlist playlist = playlistService.findById(playlistId);
+
+        PlaylistDto playlistDto = PlaylistDto.builder()
+                .playlistId(playlist.getId())
+                .playlistName(playlist.getPlaylistName())
+                .playlistImg(playlist.getPlaylistImg())
+                .build();
+
+        List<Music> musicList = musicService.findByPlaylistId(playlistDto.getPlaylistId());
+
+        model.addAttribute("playlist", playlistDto);
+        model.addAttribute("musicList", musicList);
+
+        return "fragments/sidebar";
     }
 }

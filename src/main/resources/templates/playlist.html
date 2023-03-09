@@ -208,11 +208,11 @@
 
             <div class="row d-flex justify-content-evenly align-items-start flex-nowrap my-4">
                 <div class="col-3 d-flex flex-wrap justify-content-center">
-                    <div class="row d-flex justify-content-center align-items-center rounded-3 mb-2" style="width: 300px; height: 300px; background-color: #5e5e5e;">
+                    <div class="row d-flex justify-content-center align-items-center rounded-3 mb-2" onclick="changePlaylist()" style="width: 300px; height: 300px; background-color: #5e5e5e; cursor: pointer;">
                         <img class="w-100 h-75" th:src="@{${playlist.playlistImg}}">
                     </div>
                     <div class="row d-flex justify-content-center">
-                        <button type="button" class="btn text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">이미지 변경</button>
+                        <!--<button type="button" class="btn text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">이미지 변경</button>-->
                     </div>
                 </div>
                 <div class="col-8 d-flex flex-wrap justify-content-end me-4">
