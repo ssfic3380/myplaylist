@@ -10,7 +10,10 @@ function getPlaylistPage(playlistId) {
     })
         .done(function (result) {
             $("main").replaceWith(result);
+            $("#musicListTable tbody").tableDnD();
         })
+
+
 }
 
 /* 메인 페이지 - 플레이리스트 추가 */

@@ -14,7 +14,21 @@ var playerWidth;
 var vId;
 var current;
 
+var isEmpty = function(value) {
+    if(value == "" || value == null || value == undefined || (value != null && typeof value == "object" && !Object.keys(value).length)) return true
+    else return false
+};
+
 function loadYoutubeApi() {
+    if (isEmpty(yPlayer) == false) {
+        yPlayer.stopVideo();
+        yPlayer.destroy();
+        yPlayer = null;
+        vId = document.getElementById('music1').dataset.videoId;
+        current = 1;
+        onYouTubeIframeAPIReady();
+    }
+
     // 1. This code loads the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";

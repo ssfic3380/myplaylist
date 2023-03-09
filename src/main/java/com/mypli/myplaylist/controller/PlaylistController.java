@@ -107,8 +107,8 @@ public class PlaylistController {
     /**
      * 노래 추가 세부설정 모달 - 노래 추가
      */
-    @PostMapping("/search")
-    public String addMusic(@ModelAttribute CreateMusicDto createMusicDto, Principal principal, Model model) {
+    @PostMapping("/youtube/search")
+    public String addMusic(@ModelAttribute CreateMusicDto createMusicDto, Principal principal, RedirectAttributes redirectAttributes) {
 
         //socialId는 권한 체크용
         String socialId = "";
@@ -116,12 +116,10 @@ public class PlaylistController {
         else socialId = principal.getName();
 
         Long newMusicId = musicService.create(socialId, createMusicDto);
-        Long playlistId = musicService.findPlaylistIdById(newMusicId);
 
-        List<Music> musicList = musicService.findByPlaylistId(playlistId);
-        model.addAttribute("musicList", musicList);
+        redirectAttributes.addAttribute("playlistId", createMusicDto.getPlaylistId());
 
-        return "fragments/playlistTable";
+        return "redirect:/playlist/{playlistId}";
     }
 
     /**

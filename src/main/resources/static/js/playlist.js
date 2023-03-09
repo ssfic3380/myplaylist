@@ -1,3 +1,7 @@
+function setTableDnD() {
+    $("#musicListTable tbody").tableDnD();
+}
+
 /* 플레이리스트 페이지 - 홈 페이지로 이동 */
 function getHomePage() {
     console.log("getHomePage(): " + token);
@@ -21,7 +25,7 @@ $(document).on('click', '.btn-videoId-modal', function() {
 });
 
 
-/* 플레이리스트 페이지 - 현재 플레이리스트 변경 */
+/* 플레이리스트 페이지 - 현재 재생중인 플레이리스트 변경 */
 document.write('<script src="/js/sidebar.js"></script>');
 function changePlaylist() {
     var params = {
@@ -39,6 +43,7 @@ function changePlaylist() {
         .done(function (result) {
             $("aside").empty();
             $("aside").replaceWith(result);
+
             loadYoutubeApi();
         })
         .fail(function (jqXHR) {
@@ -145,6 +150,7 @@ $(document).on('click', '.youtubePlaylist', function() {
     })
         .done(function (result) {
             $("main").replaceWith(result);
+            setTableDnD();
         })
         .fail(function (jqXHR) {
             console.log(jqXHR);
@@ -152,6 +158,7 @@ $(document).on('click', '.youtubePlaylist', function() {
         .always(function() {
 
         })
+
 
 })
 
@@ -295,7 +302,8 @@ function postAddMusic() {
         dataType: "text"
     })
         .done(function (result) {
-            $("#musicListDiv").replaceWith(result);
+            $("main").replaceWith(result);
+            setTableDnD();
         })
         .fail(function (jqXHR) {
             console.log(jqXHR);
@@ -309,3 +317,6 @@ function postAddMusic() {
 $(document).on('hidden.bs.modal', '#musicAddSettingModal', function(e) {
     $(this).find('form')[0].reset();
 });
+
+
+/* 테이블 드래그 앤 드롭 */
