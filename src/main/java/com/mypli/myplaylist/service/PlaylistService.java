@@ -33,9 +33,6 @@ public class PlaylistService {
 
         Member member = memberService.findBySocialId(socialId);
 
-        if (playlistDto.getPlaylistImg() == null) {
-            //TODO: 이미지가 없을 때, 기본 이미지를 넣어줘야 함
-        }
         Playlist newPlaylist = Playlist.createPlaylist(member, playlistDto.getPlaylistName(), playlistDto.getPlaylistImg());
 
         return playlistRepository.save(newPlaylist).getId();

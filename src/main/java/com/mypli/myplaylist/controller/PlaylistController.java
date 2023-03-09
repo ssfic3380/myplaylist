@@ -2,8 +2,10 @@ package com.mypli.myplaylist.controller;
 
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
+import com.mypli.myplaylist.dto.AddMusicDto;
 import com.mypli.myplaylist.dto.CreateMusicDto;
 import com.mypli.myplaylist.dto.PlaylistDto;
+import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.service.MusicService;
 import com.mypli.myplaylist.service.PlaylistService;
 import com.mypli.myplaylist.service.youtube.YoutubePlaylistItemsService;
@@ -64,6 +66,7 @@ public class PlaylistController {
         return "playlistDetail";
     }
 
+
     /**
      * 플레이리스트 상세정보 페이지 - 노래 삭제
      */
@@ -78,7 +81,27 @@ public class PlaylistController {
 
         redirectAttributes.addAttribute("playlistId", playlistId);
 
-        return "redirect:/{playlistId}";
+        return "redirect:/playlist/{playlistId}";
+    }
+
+    /**
+     * 유튜브에서 불러오기 모달 - 유튜브 플레이리스트의 노래를 현재 플레이리스트에 추가
+     */
+    @PostMapping("/youtube/playlists")
+    public String addPlaylistFromYoutube(@ModelAttribute AddMusicDto addMusicDto, Principal principal, RedirectAttributes redirectAttributes) {
+        //"유튜브에서 불러오기" -> 유튜브 플레이리스트 하나를 선택했을 경우
+
+        String socialId = "";
+        if (principal == null) return "redirect:/oauth2/login";
+        else socialId = principal.getName();
+
+        List<YoutubePlaylistItemDto> youtubePlaylistItemResultList = youtubePlaylistItemsService.getPlaylistItems(socialId, addMusicDto.getYoutubePlaylistId());
+
+        Long playlistId = musicService.importFromYoutube(socialId, addMusicDto, youtubePlaylistItemResultList);
+
+        redirectAttributes.addAttribute("playlistId", playlistId);
+
+        return "redirect:/playlist/{playlistId}";
     }
 
     /**
@@ -96,7 +119,6 @@ public class PlaylistController {
         Long playlistId = musicService.findPlaylistIdById(newMusicId);
 
         List<Music> musicList = musicService.findByPlaylistId(playlistId);
-
         model.addAttribute("musicList", musicList);
 
         return "fragments/playlistTable";

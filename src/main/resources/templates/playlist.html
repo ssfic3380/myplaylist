@@ -43,21 +43,17 @@
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
-                            <div class="d-flex align-items-center border-top border-bottom mb-1 py-1" onclick="location.href='#'" style="cursor: pointer;">
-                                <div class="flex-shrink-0">
-                                    <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                            <div id="youtubePlaylistResult">
+                                <!--
+                                <div class="youtubePlaylist d-flex align-items-center border-top border-bottom mb-1 py-1" onclick="getYoutubePlaylist()" style="cursor: pointer;">
+                                    <div class="flex-shrink-0">
+                                        <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3 fw-bold fs-4">
+                                        여행
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 ms-3 fw-bold fs-4">
-                                    여행
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center border-top border-bottom mb-1 py-1" onclick="location.href='#';" style="cursor: pointer;">
-                                <div class="flex-shrink-0">
-                                    <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
-                                </div>
-                                <div class="flex-grow-1 ms-3 fw-bold fs-4">
-                                    놀러가자
-                                </div>
+                                -->
                             </div>
                         </div>
                     </div>
@@ -185,7 +181,7 @@
         </div>
 
         <!-- 플레이리스트 페이지 -->
-        <div class="container-fluid p-3">
+        <div id="playlistPage" class="container-fluid p-3">
             <div class="row mx-2 mt-2" style="height: 100px">
                 <div class="col-3 d-flex justify-content-center align-items-center p-2">
                     <!-- hidden 영역 -->

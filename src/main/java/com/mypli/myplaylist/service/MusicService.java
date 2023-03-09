@@ -3,20 +3,18 @@ package com.mypli.myplaylist.service;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
+import com.mypli.myplaylist.dto.AddMusicDto;
 import com.mypli.myplaylist.dto.CreateMusicDto;
-import com.mypli.myplaylist.dto.MusicDto;
+import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.exception.MusicNotFoundException;
 import com.mypli.myplaylist.exception.NoPermissionException;
-import com.mypli.myplaylist.exception.PlaylistNotFoundException;
 import com.mypli.myplaylist.repository.MusicRepository;
-import com.mypli.myplaylist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -40,6 +38,7 @@ public class MusicService {
         Playlist playlist = playlistService.findById(createMusicDto.getPlaylistId());
         checkAuthority(member, playlist); // TODO: 404 NOT FOUND가 날아가고, errorMessage가 NoPermission인지 확인
 
+        // 2. 노래 생성
         Music newMusic = Music.createMusic(
                 playlist,
                 createMusicDto.getTitle(),
@@ -50,6 +49,38 @@ public class MusicService {
                 createMusicDto.getMusicOrder());
 
         return musicRepository.save(newMusic).getId();
+    }
+
+    /**
+     * 유튜브 플레이리스트의 아이템을 추가
+     */
+    @Transactional
+    public Long importFromYoutube(String socialId, AddMusicDto addMusicDto, List<YoutubePlaylistItemDto> youtubePlaylistItemDtoList) {
+
+        // 1. 권한 체크
+        Member member = memberService.findBySocialId(socialId);
+        Playlist playlist = playlistService.findById(addMusicDto.getPlaylistId());
+        checkAuthority(member, playlist);
+
+        // 2. 플레이리스트의 이름, 이미지 변경
+        playlist.updatePlaylistName(addMusicDto.getYoutubePlaylistName());
+        playlist.updatePlaylistImg(addMusicDto.getYoutubePlaylistImg());
+
+        Long musicOrder = addMusicDto.getLastMusicOrder();
+        for (YoutubePlaylistItemDto youtubePlaylistItemDto : youtubePlaylistItemDtoList) {
+            Music.createMusic(
+                    playlist,
+                    youtubePlaylistItemDto.getTitle(),
+                    youtubePlaylistItemDto.getArtist(),
+                    youtubePlaylistItemDto.getAlbum(),
+                    youtubePlaylistItemDto.getVideoId(),
+                    youtubePlaylistItemDto.getThumbnail(),
+                    musicOrder);
+
+            musicOrder++;
+        }
+
+        return playlist.getId();
     }
 
 

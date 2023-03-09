@@ -50,6 +50,112 @@ function changePlaylist() {
 }
 
 
+/* 플레이리스트 추가 모달 */
+// 모달 창 종료시 검색 결과 삭제
+$(document).on('hidden.bs.modal', '#playlistAddModal', function(e) {
+    $(this).find('#youtubePlaylistResult')[0].replaceChildren();
+});
+
+// 플레이리스트 검색 결과 추가
+function addYoutubePlaylistResults(youtubePlaylistId, title, thumbnail) {
+    /*
+        <div class="youtubePlaylist d-flex align-items-center border-top border-bottom mb-1 py-1" onclick="getYoutubePlaylist()" style="cursor: pointer;">
+            <div class="flex-shrink-0">
+                <img th:src="@{https://i.ytimg.com/vi/nMWRL0aZ7SU/default.jpg}">
+            </div>
+            <div class="flex-grow-1 ms-3 fw-bold fs-4">
+                여행
+            </div>
+        </div>
+     */
+    const playlist = document.createElement("div");
+    playlist.classList.add("youtubePlaylist", "d-flex", "align-items-center", "border-top", "border-bottom", "mb-1", "py-1")
+    playlist.style.cursor = 'pointer';
+    playlist.setAttribute("data-youtube-playlist-id", youtubePlaylistId);
+    playlist.setAttribute("data-bs-dismiss", "modal");
+
+    const playlistThumbnail = document.createElement("div");
+    playlistThumbnail.classList.add("flex-shrink-0");
+    const playlistThumbnailImg = document.createElement("img");
+    playlistThumbnailImg.classList.add("addPlaylistThumbnail");
+    playlistThumbnailImg.src = thumbnail;
+    playlistThumbnailImg.style.width = '120px';
+    playlistThumbnailImg.style.height = '90px';
+    playlistThumbnailImg.setAttribute("data-thumbnail", thumbnail);
+    playlistThumbnail.appendChild(playlistThumbnailImg);
+
+    const playlistTitle = document.createElement("div");
+    playlistTitle.classList.add("addPlaylistTitle", "flex-grow-1", "ms-3", "fw-bold", "fs-4");
+    playlistTitle.textContent = title;
+    playlistTitle.setAttribute("data-title", title);
+
+    playlist.appendChild(playlistThumbnail);
+    playlist.appendChild(playlistTitle);
+
+    document.getElementById("youtubePlaylistResult").appendChild(playlist);
+}
+
+// 모달 창이 켜지면 바로 플레이리스트 검색
+$(document).on('shown.bs.modal', '#playlistAddModal', function(e) {
+    console.log("getYoutubePlaylist(): " + token);
+
+    $.ajax({
+        type: "GET",
+        url: "/playlist/youtube/playlists",
+        headers: {'Authorization': 'Bearer ' + token},
+        dataType: "json"
+    })
+        .done(function (result) {
+            // 새로운 검색 기록 추가
+            var playlistList = result.body.data;
+            for (var i = 0; i < playlistList.length; i++) {
+                var playlist = JSON.parse(JSON.stringify(playlistList[i]));
+                addYoutubePlaylistResults(playlist.playlistId, playlist.title, playlist.thumbnail);
+            }
+        })
+        .fail(function (jqXHR) {
+            console.log(jqXHR);
+        })
+        .always(function() {
+
+        })
+});
+
+// 플레이리스트 선택 시 현재 플레이리스트에 노래 추가
+$(document).on('click', '.youtubePlaylist', function() {
+    console.log("postAddPlaylist(): " + token);
+
+    var mOrder = $("#musicListTableBody").children().last().children('th').data('music-order') + 1;
+    if (!mOrder) mOrder = 1;
+
+    var params = {
+        playlistId : $("#playlistId").val(),
+        youtubePlaylistId : $(this).data('youtube-playlist-id'),
+        youtubePlaylistName : $(this).children(".addPlaylistTitle").data('title'),
+        youtubePlaylistImg : $(this).children().children(".addPlaylistThumbnail").data('thumbnail'),
+        lastMusicOrder : mOrder
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "/playlist/youtube/playlists",
+        headers: {'Authorization': 'Bearer ' + token},
+        data: params,
+        dataType: "text"
+    })
+        .done(function (result) {
+            $("main").replaceWith(result);
+        })
+        .fail(function (jqXHR) {
+            console.log(jqXHR);
+        })
+        .always(function() {
+
+        })
+
+})
+
+
 /* 노래 추가 모달 */
 // 모달 창 종료시 검색 결과 삭제
 $(document).on('hidden.bs.modal', '#musicAddModal', function(e) {
@@ -58,7 +164,7 @@ $(document).on('hidden.bs.modal', '#musicAddModal', function(e) {
 });
 
 /* 노래 추가 모달 - 검색 버튼 */
-// 검색 결과 추가
+// 노래 검색 결과 추가
 function addYoutubeSearchResults(title, artist, thumbnail, videoId) {
     /*
         div id="youtubeSearchResult"
@@ -123,7 +229,7 @@ function getYoutubeSearchList() {
 
     $.ajax({
         type: "GET",
-        url: "/playlist/search",
+        url: "/playlist/youtube/search",
         headers: {'Authorization': 'Bearer ' + token},
         data: params,
         dataType: "json"
@@ -168,19 +274,22 @@ $(document).on('click', '.music', function() {
 function postAddMusic() {
     console.log("postAddMusic(): " + token);
 
+    var mOrder = $("#musicListTableBody").children().last().children('th').data('music-order') + 1;
+    if (!mOrder) mOrder = 1;
+
     var params = {
         title : $("#musicTitle").val(),
         artist : $("#musicArtist").val(),
         album : $("#musicAlbum").val(),
         videoId : $("#musicVideoId").val(),
         musicImg : $("#musicThumbnail").val(),
-        musicOrder : $("#musicListTableBody").children().last().children('th').data('music-order') + 1,
+        musicOrder : mOrder,
         playlistId : $("#playlistId").val()
     }
 
     $.ajax({
         type: "POST",
-        url: "/playlist/search",
+        url: "/playlist/youtube/search",
         headers: {'Authorization': 'Bearer ' + token},
         data: params,
         dataType: "text"

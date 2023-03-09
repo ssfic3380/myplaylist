@@ -39,8 +39,6 @@ import java.util.Optional;
 public class HomeController {
 
     private final PlaylistService playlistService;
-    private final YoutubePlaylistsService youtubePlaylistsService;
-    private final YoutubePlaylistItemsService youtubePlaylistItemsService;
 
     /**
      * 메인페이지
@@ -69,59 +67,6 @@ public class HomeController {
         if (refresh != null && refresh.equals("true")) return "home :: main";
         else return "home";
     }
-
-    /**
-     * 메인페이지 - 플레이리스트 추가 (누르면 바로 새 플레이리스트의 상세페이지로 이동)
-     */
-    @PostMapping("/")
-    public String createPlaylist(Principal principal,
-                                 RedirectAttributes redirectAttributes) {
-        //"추가" 버튼을 클릭했을 경우
-
-        String socialId = principal.getName();
-
-        PlaylistDto playlistDto = PlaylistDto.builder()
-                .playlistName("새 플레이리스트")
-                .build();
-        Long playlistId = playlistService.create(socialId, playlistDto);
-
-        redirectAttributes.addAttribute("playlistId", playlistId);
-
-        return "redirect:/playlist/{playlistId}";
-    }
-
-    /**
-     * 메인페이지 - 유튜브에서 불러오기
-     */
-    @GetMapping("/youtube/playlists")
-    public String getYoutubePlaylists(Principal principal, Model model) {
-        //"유튜브에서 불러오기" 버튼을 클릭했을 경우 (팝업창 띄우기는 프론트에서 처리)
-
-        String socialId = principal.getName();
-
-        List<YoutubePlaylistDto> youtubePlaylistResultList = youtubePlaylistsService.getPlaylists(socialId);
-        model.addAttribute("youtubePlaylists", youtubePlaylistResultList);
-
-        //TODO: 프론트에서 띄운 유튜브 플레이리스트 목록 팝업창으로 return해야함 (아마 youtube 디렉토리에 importPopup이라는 이름으로 HTML 만들지 않을까?)
-        return "playlist";
-    }
-
-    @PostMapping("/youtube/playlists")
-    public String createPlaylistFromYoutube(Principal principal,
-                                            @ModelAttribute("youtubePlaylist") YoutubePlaylistDto youtubePlaylistDto,
-                                            RedirectAttributes redirectAttributes) {
-        //"유튜브에서 불러오기" -> 유튜브 플레이리스트 하나를 선택했을 경우
-
-        String socialId = principal.getName();
-
-        List<YoutubePlaylistItemDto> youtubePlaylistItemResultList = youtubePlaylistItemsService.getPlaylistItems(socialId, youtubePlaylistDto.getPlaylistId());
-        Long playlistId = playlistService.importFromYoutube(socialId, youtubePlaylistDto, youtubePlaylistItemResultList);
-
-        redirectAttributes.addAttribute("playlistId", playlistId);
-
-        return "redirect:/playlist/{playlistId}";
-    }
-
 
 
 

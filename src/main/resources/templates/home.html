@@ -19,9 +19,7 @@
                     <h1 class="text-center fw-bold">플레이리스트 목록</h1>
                 </div>
                 <div class="col-9 d-flex justify-content-end align-items-center">
-                    <form method="POST">
-                        <button type="submit" class="btn me-4 text-center text-white" onclick="location.href='/playlist'" style="background-color: #5e5e5e;">추가</button>
-                    </form>
+                    <button type="button" class="btn me-4 text-center text-white" onclick="createPlaylist()" style="background-color: #5e5e5e;">추가</button>
                     <form method="DELETE">
                         <button type="button" class="btn me-4 text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">삭제</button>
                     </form>
@@ -30,10 +28,9 @@
                     </form>
                 </div>
             </div>
-            <div class="row d-flex flex-wrap justify-content-start align-content-start px-2 m-4" th:each="playlist : ${playlistList}">
-                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" style="width: 300px; height: 340px; background-color: #5e5e5e; cursor: pointer;"
-                     th:onclick="|getPlaylistPage(${playlist.id})|">
-                <!--th:onclick="|location.href='@{/playlist/{param1}(param1=${playlist.id})}'|">-->
+            <div class="row d-flex flex-wrap justify-content-start align-content-start px-2 m-4" >
+                <div class="d-flex flex-wrap justify-content-center rounded-3 m-4 pt-4" th:each="playlist : ${playlistList}" th:onclick="|getPlaylistPage(${playlist.id})|"
+                     style="width: 300px; height: 340px; background-color: #5e5e5e; cursor: pointer;">
                     <img class="w-100 h-75" th:src="@{${playlist.playlistImg}}">
                     <p class="text-center text-white fw-bold" th:text="${playlist.playlistName}">이름</p>
                 </div>

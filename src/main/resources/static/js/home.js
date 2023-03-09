@@ -12,3 +12,18 @@ function getPlaylistPage(playlistId) {
             $("main").replaceWith(result);
         })
 }
+
+/* 메인 페이지 - 플레이리스트 추가 */
+function createPlaylist() {
+    console.log("createPlaylist(): " + token);
+
+    $.ajax({
+        type: "POST",
+        url: "/",
+        headers: {'Authorization': 'Bearer ' + token},
+        dataType: "json"
+    })
+        .done(function (result) {
+            getPlaylistPage(result.body.playlistId);
+        })
+}

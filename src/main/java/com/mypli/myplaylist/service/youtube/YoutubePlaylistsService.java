@@ -123,7 +123,7 @@ public class YoutubePlaylistsService {
 
             String playlistId = singlePlaylist.getId();
             String title = singlePlaylist.getSnippet().getTitle();
-            String thumbnail = singlePlaylist.getSnippet().getThumbnails().getDefault().getUrl();
+            String thumbnail = singlePlaylist.getSnippet().getThumbnails().getStandard().getUrl();
 
             YoutubePlaylistDto currentItem = YoutubePlaylistDto.builder()
                     .playlistId(playlistId)
