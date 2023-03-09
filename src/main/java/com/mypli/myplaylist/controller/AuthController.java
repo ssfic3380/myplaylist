@@ -49,7 +49,10 @@ public class AuthController {
     @GetMapping("/logout")
     public String logout(Principal principal, HttpServletRequest request, HttpServletResponse response) {
 
-        String socialId = principal.getName();
+        String socialId = null;
+        if (principal != null) socialId = principal.getName();
+        log.info("logout: {}", socialId);
+
         memberService.updateJwtRefreshToken(socialId, "");
 
         CookieUtils.deleteCookie(request, response, "refresh-token");

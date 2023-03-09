@@ -7,8 +7,9 @@
             <ul class="nav col-6 col-lg-auto justify-content-center me-lg-auto mb-2 mb-md-0">
                 <li><a href="javascript:void(0);" onclick="getHomePage();" class="nav-link px-2 text-white">홈</a></li>
             </ul>
-            <div class="col-6 d-flex justify-content-end">
-                <button type="button" class="btn btn-outline-light me-2" onclick="location.href='/oauth2/login'">로그인</button>
+            <div id="loginDiv" class="col-6 d-flex justify-content-end">
+                <button type="button" id="loginBtn" class="btn btn-outline-light me-2" onclick="location.href='/oauth2/login'">로그인</button>
+                <button type="button" id="logoutBtn" class="btn btn-outline-light me-2" style="display: none;">로그아웃</button>
             </div>
         </div>
     </div>

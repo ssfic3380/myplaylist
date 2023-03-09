@@ -35,8 +35,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         //1. Request Header의 "Authorization: Bearer "에서 Access Token을 꺼낸다.
-        //String accessToken = HeaderUtils.getAccessToken(request);
-        String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc4MzQyOTk1fQ.uLacSYacKCximCMNKWtL7ieKM6cIG95i9U1QC9y2pmRPno6XRpNwyW7KEf1GFG_pZmxyOJA7QEBry9wG4Q9h9Q";
+        String accessToken = HeaderUtils.getAccessToken(request);
+        //String accessToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMTE1MTE3MzIxODQxODcxODk0OTEiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjc4MzQ2OTcwfQ.HLCoX02AumfNL5aJ3B0bFnIN_1HmNHQqheyNLJMsCZ8QVdGR_V2eY74wumoEq5TOAmvTKOSOIic_L-xjd17RZw";
         String refreshToken = CookieUtils.getCookie(request, REFRESH_TOKEN)
                 .map(Cookie::getValue)
                 .orElse((null));

@@ -1,8 +1,11 @@
 /* 플레이리스트 페이지 - 홈 페이지로 이동 */
 function getHomePage() {
+    console.log("getHomePage(): " + token);
+
     $.ajax({
         type: "GET",
         url: "/",
+        headers: {'Authorization': 'Bearer ' + token},
         data: { refresh : "true" },
         dataType: "text"
     })
@@ -25,9 +28,11 @@ function changePlaylist() {
         playlistId : $("#playlistId").val()
     }
 
+    console.log("changePlaylist(): " + token);
     $.ajax({
         type: "GET",
         url: "/playlist/current",
+        headers: {'Authorization': 'Bearer ' + token},
         data: params,
         dataType: "text"
     })
@@ -110,6 +115,8 @@ function removeYoutubeSearchResults() {
 }
 
 function getYoutubeSearchList() {
+    console.log("getYoutubeSearchList(): " + token);
+
     var params = {
         q : $("#youtubeSearchQuery").val()
     }
@@ -117,6 +124,7 @@ function getYoutubeSearchList() {
     $.ajax({
         type: "GET",
         url: "/playlist/search",
+        headers: {'Authorization': 'Bearer ' + token},
         data: params,
         dataType: "json"
     })
@@ -158,6 +166,8 @@ $(document).on('click', '.music', function() {
 
 // 확인 버튼 클릭시
 function postAddMusic() {
+    console.log("postAddMusic(): " + token);
+
     var params = {
         title : $("#musicTitle").val(),
         artist : $("#musicArtist").val(),
@@ -171,6 +181,7 @@ function postAddMusic() {
     $.ajax({
         type: "POST",
         url: "/playlist/search",
+        headers: {'Authorization': 'Bearer ' + token},
         data: params,
         dataType: "text"
     })

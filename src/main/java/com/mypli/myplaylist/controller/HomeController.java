@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +47,17 @@ public class HomeController {
      */
     @GetMapping("/")
     public String showAllPlaylists(@RequestParam(value = "refresh", required = false) String refresh,
-                                   Principal principal, Model model) {
+                                   HttpServletRequest request, HttpServletResponse response, Principal principal, Model model) {
         //마플리 홈페이지 (유저의 모든 플레이리스트 보여주기)
 
-        if (principal == null) return "redirect:/oauth2/login"; //TODO: 일단 RefreshToken 만료시 무조건 다시 로그인
+        Map<String, ?> flashMap = RequestContextUtils.getInputFlashMap(request);
+        if (flashMap != null) {
+            String accessToken = (String) flashMap.get("token");
+            HeaderUtils.setAccessToken(response, accessToken);
+            model.addAttribute("token", accessToken);
+        }
+
+        //if (principal == null) return "redirect:/oauth2/login"; //TODO: 일단 RefreshToken 만료시 무조건 다시 로그인
         
         String socialId = null;
         if (principal != null) socialId = principal.getName(); //TODO: 하지만 비로그인을 위해서 조금 고민해봐야 함

@@ -13,12 +13,54 @@
 
     <script src="/js/bootstrap.js"></script>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script th:inline="javascript">
+        var token = [[${token}]];
+        if (token) {
+            console.log(token);
+
+            $.ajax({
+                type: "GET",
+                url: "/",
+                headers: {'Authorization': 'Bearer ' + token},
+                data: { refresh : "true" },
+                dataType: "text"
+            })
+                .done(function (result) {
+                    $("main").replaceWith(result);
+                    $("#loginBtn").css('display', 'none');
+                    $("#logoutBtn").css('display', 'block');
+                })
+                .fail(function (jqXHR) {
+                    console.log(jqXHR);
+                })
+                .always(function() {
+
+                })
+        }
+
+        $(document).on('click', '#logoutBtn', function() {
+            $("#loginBtn").css('display', 'block');
+            $("#logoutBtn").css('display', 'none');
+
+            $.ajax({
+                type: "GET",
+                url: "/oauth2/logout",
+                headers: {'Authorization': 'Bearer ' + token},
+            })
+                .done(function (result) {
+                    window.location = '/';
+                })
+                .fail(function (jqXHR) {
+                    console.log(jqXHR);
+                })
+                .always(function() {
+
+                })
+        });
+    </script>
     <script defer th:src="@{/js/home.js}"></script>
     <script defer th:src="@{/js/playlist.js}"></script>
     <script defer th:src="@{/js/sidebar.js}"></script>
-    <script defer th:inline="javascript">
-
-    </script>
 
     <!-- content script -->
     <!--<th:block layout:fragment="css"></th:block>-->
