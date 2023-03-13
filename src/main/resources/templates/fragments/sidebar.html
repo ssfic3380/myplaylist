@@ -4,8 +4,8 @@
 <aside th:fragment="sidebarFragment">
 
     <div id="playlist-name" class="d-flex flex-column align-items-center my-3">
-        <h2 class="text-white-50"><strong>현재 플레이리스트</strong></h2>
-        <h3 class="text-white" th:text="${playlist?.playlistName}"></h3>
+        <h2 class="text-white-50 text-truncate"><strong>현재 플레이리스트</strong></h2>
+        <h3 class="text-white text-truncate" th:text="${playlist?.playlistName}"></h3>
     </div>
 
     <div id="player" class="w-100"></div>

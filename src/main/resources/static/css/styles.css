@@ -16,20 +16,15 @@
   background-color: #404040;
 }
 
-body {
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-}
-
-html {
-  height: -webkit-fill-available;
+html, body {
+  height: 100vh;
+  overflow: hidden;
 }
 
 main {
-  height: -webkit-fill-available;
-  height: 100vh;
-  min-height: 100vh;
+  height: 100%;
   width: 80%;
+  padding-bottom: 3%;
 
   float: left;
   overflow-x: hidden;
@@ -38,10 +33,9 @@ main {
 }
 
 aside {
-  height: -webkit-fill-available;
-  height: 100vh;
-  min-height: 100vh;
+  height: 100%;
   width: 20%;
+  padding-bottom: 3%;
 
   float: right;
   overflow-x: hidden;
