@@ -3,8 +3,7 @@ package com.mypli.myplaylist.service;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
-import com.mypli.myplaylist.dto.AddMusicDto;
-import com.mypli.myplaylist.dto.CreateMusicDto;
+import com.mypli.myplaylist.dto.*;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.exception.MusicNotFoundException;
 import com.mypli.myplaylist.exception.NoPermissionException;
@@ -96,7 +95,7 @@ public class MusicService {
      * "플레이리스트 아이디"로 조회(1개 -> n개)
      */
     public List<Music> findByPlaylistId(Long playlistId) {
-        return musicRepository.findByPlaylistId(playlistId);
+        return musicRepository.findByPlaylistIdOrderByMusicOrder(playlistId);
     }
 
     /**
@@ -131,85 +130,65 @@ public class MusicService {
 
     //==변경==//
     /**
+     * 노래 정보 변경
+     */
+    @Transactional
+    public Long update(String socialId, UpdateMusicDto updateMusicDto) {
+        // 1. 권한 체크
+        Member member = memberService.findBySocialId(socialId);
+        Playlist playlist = playlistService.findById(updateMusicDto.getPlaylistId());
+        checkAuthority(member, playlist);
+
+        // 2. 노래 정보 변경
+        Music music = findById(updateMusicDto.getMusicId());
+
+        music.updateTitle(updateMusicDto.getTitle());
+        music.updateArtist(updateMusicDto.getArtist());
+        music.updateAlbum(updateMusicDto.getAlbum());
+        music.updateVideoId(updateMusicDto.getVideoId());
+        music.updateMusicOrder(updateMusicDto.getMusicOrder());
+
+        return music.getId();
+    }
+
+    /**
+     * 노래 순서 변경
+     */
+    @Transactional
+    public void updateOrder(String socialId, UpdateMusicOrderDto updateMusicOrderDto) {
+        // 1. 권한 체크
+        Member member = memberService.findBySocialId(socialId);
+        Playlist playlist = playlistService.findById(updateMusicOrderDto.getPlaylistId());
+        checkAuthority(member, playlist);
+
+        // 2. 노래 순서 변경
+        Long musicIds[] = updateMusicOrderDto.getMusicIds();
+        for (int i = 0; i < musicIds.length; i++) { //TODO: 시간복잡도 개선 필요
+            Music music = findById(musicIds[i]);
+            music.updateMusicOrder((long) i + 1);
+        }
+    }
+
+
+    /**
      * 노래 순서 변경(노래 2개 맞바꾸기)
      */
-    @Transactional
-    public Long[] exchangeOrder(Long musicId1, Long musicId2) {
-        Music music1 = findById(musicId1);
-        Music music2 = findById(musicId2);
+    /*@Transactional
+    public Long[] exchangeOrder(String socialId, UpdateMusicOrderDto updateMusicOrderDto) {
+        // 1. 권한 체크
+        Member member = memberService.findBySocialId(socialId);
+        Playlist playlist = playlistService.findById(updateMusicOrderDto.getPlaylistId());
+        checkAuthority(member, playlist);
 
-        Long temp = music1.getMusicOrder();
-        music1.updateMusicOrder(music2.getMusicOrder());
-        music2.updateMusicOrder(temp);
+        // 2. 노래 순서 변경
+        Music music1 = findById(updateMusicOrderDto.getMusicId1());
+        Music music2 = findById(updateMusicOrderDto.getMusicId2());
+
+        music1.updateMusicOrder(updateMusicOrderDto.getMusicOrder1());
+        music2.updateMusicOrder(updateMusicOrderDto.getMusicOrder2());
 
         return new Long[] {music1.getId(), music2.getId()};
-    }
-
-    /**
-     * 노래 순서 변경(맨 위 or 맨 아래로 옮기기)
-     */
-    @Transactional
-    public Long updateOrderById(Long musicId, Long newOrder) {
-        Music music = findById(musicId);
-        music.updateMusicOrder(newOrder);
-
-        return music.getId();
-    }
-
-    /**
-     * 노래 정보 변경(제목)
-     */
-    @Transactional
-    public Long updateTitleById(Long musicId, String newTitle) {
-        Music music = findById(musicId);
-        music.updateTitle(newTitle);
-
-        return music.getId();
-    }
-
-    /**
-     * 노래 정보 변경(가수)
-     */
-    @Transactional
-    public Long updateArtistById(Long musicId, String newArtist) {
-        Music music = findById(musicId);
-        music.updateArtist(newArtist);
-
-        return music.getId();
-    }
-
-    /**
-     * 노래 정보 변경(앨범)
-     */
-    @Transactional
-    public Long updateAlbumById(Long musicId, String newAlbum) {
-        Music music = findById(musicId);
-        music.updateAlbum(newAlbum);
-
-        return music.getId();
-    }
-
-    /**
-     * 노래 정보 변경(유튜브 주소)
-     */
-    @Transactional
-    public Long updateVideoIdById(Long musicId, String newVideoId) {
-        Music music = findById(musicId);
-        music.updateVideoId(newVideoId);
-
-        return music.getId();
-    }
-
-    /**
-     * 노래 정보 변경(이미지)
-     */
-    @Transactional
-    public Long updateImgById(Long musicId, String newImg) {
-        Music music = findById(musicId);
-        music.updateMusicImg(newImg);
-
-        return music.getId();
-    }
+    }*/
 
 
     //==삭제==//

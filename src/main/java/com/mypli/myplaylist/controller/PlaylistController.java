@@ -2,9 +2,7 @@ package com.mypli.myplaylist.controller;
 
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
-import com.mypli.myplaylist.dto.AddMusicDto;
-import com.mypli.myplaylist.dto.CreateMusicDto;
-import com.mypli.myplaylist.dto.PlaylistDto;
+import com.mypli.myplaylist.dto.*;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.service.MusicService;
 import com.mypli.myplaylist.service.PlaylistService;
@@ -16,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.List;
 
@@ -56,14 +55,57 @@ public class PlaylistController {
     }
 
     /**
-     * 플레이리스트 상세정보 페이지 - 변경사항 저장 (렌더링용 html 만들고 거기에 model넣어서 ajax로 일부 교체)
+     * 플레이리스트 상세정보 페이지 - 플레이리스트 이름 변경
      */
-    @PutMapping("/{playlistId}")
-    public String updatePlaylist(@PathVariable String playlistId) {
-        //TODO: PatchMapping도 생각해보자 (부분 덮어쓰기)
-        //TODO: PlaylistName, 그리고 Playlist가 가진 Music들의 변경점을 반영해야함 (이거 카카오오븐에 쎠놨던거 참고)
+    @PostMapping("/{playlistId}/playlist")
+    public String updatePlaylist(@PathVariable String playlistId, @RequestBody UpdatePlaylistDto updatePlaylistDto,
+                                 Principal principal, RedirectAttributes redirectAttributes) {
 
-        return "playlistDetail";
+        String socialId = "";
+        if (principal == null) return "redirect:/oauth2/login";
+        else socialId = principal.getName();
+
+        playlistService.updateName(socialId, updatePlaylistDto);
+
+        redirectAttributes.addAttribute("playlistId", playlistId);
+
+        return "redirect:/playlist/{playlistId}";
+    }
+
+    /**
+     * 플레이리스트 상세정보 페이지 - 노래 정보 변경
+     */
+    @PostMapping("/{playlistId}/music")
+    public String updateMusic(@PathVariable String playlistId, @RequestBody UpdateMusicDto updateMusicDto,
+                              Principal principal, RedirectAttributes redirectAttributes) {
+
+        String socialId = "";
+        if (principal == null) return "redirect:/oauth2/login";
+        else socialId = principal.getName();
+
+        musicService.update(socialId, updateMusicDto);
+
+        redirectAttributes.addAttribute("playlistId", playlistId);
+
+        return "redirect:/playlist/{playlistId}";
+    }
+
+    /**
+     * 플레이리스트 상세정보 페이지 - 노래 순서 변경
+     */
+    @PostMapping("/{playlistId}/music-order")
+    public String updateMusicOrder(@PathVariable String playlistId, @ModelAttribute UpdateMusicOrderDto updateMusicOrderDto,
+                                   Principal principal, RedirectAttributes redirectAttributes) {
+
+        String socialId = "";
+        if (principal == null) return "redirect:/oauth2/login";
+        else socialId = principal.getName();
+
+        musicService.updateOrder(socialId, updateMusicOrderDto);
+
+        redirectAttributes.addAttribute("playlistId", playlistId);
+
+        return "redirect:/playlist/{playlistId}";
     }
 
 
@@ -77,7 +119,7 @@ public class PlaylistController {
         Long musicIdL = Long.parseLong(musicId);
         Music music = musicService.findById(musicIdL);
         Long playlistId = music.getPlaylist().getId();
-        musicService.deleteById(musicIdL); //TODO: 플레이리스트의 musicList에서 지워지는지 확인(안해도 될것같긴 함)
+        musicService.deleteById(musicIdL);
 
         redirectAttributes.addAttribute("playlistId", playlistId);
 

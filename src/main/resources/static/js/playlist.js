@@ -1,6 +1,41 @@
+/* 플레이리스트 페이지 - tableDnD 설정 */
 function setTableDnD() {
-    $("#musicListTable tbody").tableDnD();
+    $("#musicListTable tbody").tableDnD({
+        onDrop: function (table, row) {
+            let rows = table.rows;
+            let musicIds = new Array();
+            for (let i = 0; i < rows.length; i++) {
+                musicIds.push(rows[i].id);
+            }
+
+            let playlistId = $("#playlistId").val();
+            let url = "/playlist/" + playlistId + "/music-order";
+            let params = {
+                playlistId : playlistId,
+                musicIds : musicIds
+            };
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                headers: {'Authorization': 'Bearer ' + token},
+                data: params,
+                dataType: "text"
+            })
+                .done(function (result) {
+                    $("main").replaceWith(result);
+                    setTableDnD();
+                })
+                .fail(function (jqXHR) {
+                    console.log(jqXHR);
+                })
+                .always(function() {
+
+                })
+        }
+    });
 }
+
 
 /* 플레이리스트 페이지 - 홈 페이지로 이동 */
 function getHomePage() {
@@ -18,21 +53,67 @@ function getHomePage() {
         })
 }
 
+
 /* 플레이리스트 페이지 - 노래 수정 버튼 */
 $(document).on('click', '.btn-videoId-modal', function() {
     var data = $(this).data('video-id');
+    var buttonId = $(this).attr('id');
+
     $("#youtubeUrlInput").val(data);
+    $("#youtubeUrlButtonId").val(buttonId);
 });
+
+
+/* 유튜브 URL 변경 모달 - 확인 버튼 */
+function updateUrl() {
+    let newUrl = $("#youtubeUrlInput").val();
+    let buttonId = $("#youtubeUrlButtonId").val();
+
+    $("#" + buttonId).data('video-id', newUrl);
+
+    console.log("updateUrl(): " + token);
+    let playlistId = $("#playlistId").val();
+    let url = "/playlist/" + playlistId + "/music";
+    let params = {
+        playlistId : playlistId,
+        musicId : $("#" + buttonId).parents("tr").data("music-id"),
+        title : $("#" + buttonId).parents("tr").children().children(".musicTitle").text(),
+        artist : $("#" + buttonId).parents("tr").children().children(".musicArtist").text(),
+        album : $("#" + buttonId).parents("tr").children().children(".musicAlbum").text(),
+        videoId : newUrl,
+        musicOrder : $("#" + buttonId).parents("tr").children(".musicOrder").text()
+    }
+
+    $.ajax({
+        type: "POST",
+        url: url,
+        headers: {'Authorization': 'Bearer ' + token},
+        data: JSON.stringify(params),
+        contentType:'application/json;charset=UTF-8',
+        dataType: "text"
+    })
+        .done(function (result) {
+            $("main").replaceWith(result);
+            setTableDnD();
+        })
+        .fail(function (jqXHR) {
+            console.log(jqXHR);
+        })
+        .always(function() {
+
+        })
+}
 
 
 /* 플레이리스트 페이지 - 현재 재생중인 플레이리스트 변경 */
 document.write('<script src="/js/sidebar.js"></script>');
 function changePlaylist() {
+
+    console.log("changePlaylist(): " + token);
     var params = {
         playlistId : $("#playlistId").val()
     }
 
-    console.log("changePlaylist(): " + token);
     $.ajax({
         type: "GET",
         url: "/playlist/current",
@@ -53,6 +134,92 @@ function changePlaylist() {
 
         })
 }
+
+
+/* 플레이리스트 페이지 - 플레이리스트 이름, 노래 정보들 변경 */
+$(function() {
+    $(document).on('focus', '.editable', function() {
+        $(this).css("border", "1px solid");
+    });
+    $(document).on('blur', '.editable',function() {
+        $(this).css("border", "initial");
+
+        let playlistId = $("#playlistId").val();
+        if ($(this).hasClass("playlistName") === true) {
+
+            if ($(this).text() !== $(this).data("default")) {
+
+                console.log("updatePlaylist(): " + token);
+                let url = "/playlist/" + playlistId + "/playlist";
+                let params = {
+                    playlistId: playlistId,
+                    playlistName: $(this).text()
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    headers: {'Authorization': 'Bearer ' + token},
+                    data: JSON.stringify(params),
+                    contentType:'application/json;charset=UTF-8',
+                    dataType: "text"
+                })
+                    .done(function (result) {
+                        $("main").replaceWith(result);
+                        setTableDnD();
+                    })
+                    .fail(function (jqXHR) {
+                        console.log(jqXHR);
+                    })
+                    .always(function () {
+
+                    })
+            }
+
+        } else if ($(this).hasClass("playlistName") === false) {
+
+            if ($(this).text() !== $(this).data("default")) {
+
+                console.log("updateMusic(): " + token);
+                let url = "/playlist/" + playlistId + "/music";
+                let params = {
+                    playlistId : playlistId,
+                    musicId : $(this).parents("tr").data("music-id"),
+                    title : $(this).parents("tr").children().children(".musicTitle").text(),
+                    artist : $(this).parents("tr").children().children(".musicArtist").text(),
+                    album : $(this).parents("tr").children().children(".musicAlbum").text(),
+                    videoId : $(this).parents("tr").children().children(".musicVideoId").data("video-id"),
+                    musicOrder : $(this).parents("tr").children(".musicOrder").text()
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    headers: {'Authorization': 'Bearer ' + token},
+                    data: JSON.stringify(params),
+                    contentType:'application/json;charset=UTF-8',
+                    dataType: "text"
+                })
+                    .done(function (result) {
+                        $("main").replaceWith(result);
+                        setTableDnD();
+                    })
+                    .fail(function (jqXHR) {
+                        console.log(jqXHR);
+                    })
+                    .always(function() {
+
+                    })
+            }
+        }
+    });
+    $(document).on('keypress', '.editable', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $(this).blur();
+        }
+    });
+});
 
 
 /* 플레이리스트 추가 모달 */
@@ -319,4 +486,3 @@ $(document).on('hidden.bs.modal', '#musicAddSettingModal', function(e) {
 });
 
 
-/* 테이블 드래그 앤 드롭 */

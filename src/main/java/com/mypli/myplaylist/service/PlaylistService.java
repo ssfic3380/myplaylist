@@ -6,6 +6,7 @@ import com.mypli.myplaylist.domain.Playlist;
 import com.mypli.myplaylist.dto.CreateMusicDto;
 import com.mypli.myplaylist.dto.MusicDto;
 import com.mypli.myplaylist.dto.PlaylistDto;
+import com.mypli.myplaylist.dto.UpdatePlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.exception.NoPermissionException;
@@ -115,15 +116,45 @@ public class PlaylistService {
         return playlistRepository.findByPlaylistName(playlistName);
     }
 
+    
+    //==변경==//
+    /**
+     * 플레이리스트 이름 변경
+     */
+    @Transactional
+    public Long updateName(String socialId, UpdatePlaylistDto updatePlaylistDto) {
+        // 1. 권한 체크
+        Member member = memberService.findBySocialId(socialId);
+        Playlist playlist = findById(updatePlaylistDto.getPlaylistId());
+        checkAuthority(member, playlist);
+        
+        // 2. 플레이리스트 이름 변경
+        playlist.updatePlaylistName(updatePlaylistDto.getPlaylistName());
+        log.info("Playlist updateName: {}", updatePlaylistDto.getPlaylistName());
 
+        return playlist.getId();
+    }
+
+    
     //==삭제==//
     /**
      * 플레이리스트 삭제
      */
     @Transactional
-    public void deleteById(Long playlistId) {
-        Playlist playlist = playlistRepository.findById(playlistId).orElseThrow(PlaylistNotFoundException::new);
+    public void deleteById(String socialId, Long playlistId) {
+        // 1. 권한 체크
+        Member member = memberService.findBySocialId(socialId);
+        Playlist playlist = findById(playlistId);
+        checkAuthority(member, playlist);
+        
+        // 2. 삭제
         playlist.deletePlaylist();
         playlistRepository.deleteById(playlistId);
+    }
+
+    
+    //==권한 체크==//
+    private void checkAuthority(Member member, Playlist playlist) {
+        if (member.getId() != playlist.getMember().getId()) throw new NoPermissionException();
     }
 }

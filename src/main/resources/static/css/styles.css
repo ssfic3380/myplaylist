@@ -7,9 +7,12 @@
   -webkit-box-orient: vertical;
 }
 
+.editable {
+  cursor: text;
+}
+
 .scrollarea {
   overflow-y: auto;
-
   background-color: #404040;
 }
 

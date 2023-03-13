@@ -167,13 +167,16 @@
                             <img class="border" th:src="@{/img/urlUpdateAlert.png}">
                         </div>
                         <div class="d-flex flex-nowrap justify-content-center w-100">
+                            <!-- hidden 영역 -->
+                            <input type="hidden" id="youtubeUrlButtonId" value="">
+
                             <span class="fs-5">watch?v=</span>
                             <form class="flex-grow-0"><input type="url" class="form-control body-contents" id="youtubeUrlInput"></form>
                             <span class="fs-5">&ab_channel=</span>
                         </div>
                     </div>
                     <div class="modal-footer d-flex justify-content-center justify-content-evenly">
-                        <button type="button" class="btn btn-primary w-25" onclick="location.href='#'">확인</button>
+                        <button type="button" class="btn btn-primary w-25" onclick="updateUrl()" data-bs-dismiss="modal">확인</button>
                         <button type="button" class="btn btn-secondary w-25" data-bs-dismiss="modal">취소</button>
                     </div>
                 </div>
@@ -187,7 +190,7 @@
                     <!-- hidden 영역 -->
                     <input id="playlistId" type="hidden" th:value="${playlist.playlistId}">
 
-                    <h1 class="text-center fw-bold" contenteditable="true" th:data-default="${playlist.playlistName}" th:text="${playlist.playlistName}">플레이리스트 이름</h1>
+                    <h1 id="playlistName" class="text-center fw-bold editable playlistName" contenteditable="true" th:data-default="${playlist.playlistName}" th:text="${playlist.playlistName}">플레이리스트 이름</h1>
                 </div>
                 <div class="col-9 d-flex justify-content-end align-items-center">
                     <button type="button" class="btn me-4 text-center text-white" data-bs-toggle="modal" data-bs-target="#playlistSaveModal" style="background-color: #5e5e5e;">유튜브로 내보내기</button>
@@ -224,19 +227,19 @@
                             </tr>
                             </thead>
                             <tbody id="musicListTableBody">
-                            <tr th:each="music : ${musicList}" th:id="${music.musicOrder}">
-                                <th scope="row" th:data-music-order="${music.musicOrder}" th:text="${music.musicOrder}">1</th>
-                                <td><p class="rowColumn" contenteditable="true" th:data-music-title="${music.title}" th:text="${music.title}">제목</p></td>
-                                <td><p class="rowColumn" contenteditable="true" th:data-music-artist="${music.artist}" th:text="${music.artist}">가수</p></td>
-                                <td><p class="rowColumn" contenteditable="false" th:data-music-album="${music.album}" th:text="${music.album}">앨범</p></td>
-                                <td><button type="button" class="btn-videoId-modal btn btn-outline-dark text-center"
+                            <tr th:each="music : ${musicList}" th:id="${music.id}" th:data-music-id="${music.id}">
+                                <th scope="row" class="musicOrder" th:data-music-order="${music.musicOrder}" th:text="${music.musicOrder}">1</th>
+                                <td><p class="rowColumn musicTitle editable" contenteditable="true" th:data-default="${music.title}" th:data-music-title="${music.title}" th:text="${music.title}">제목</p></td>
+                                <td><p class="rowColumn musicArtist editable" contenteditable="true" th:data-default="${music.artist}" th:data-music-artist="${music.artist}" th:text="${music.artist}">가수</p></td>
+                                <td><p class="rowColumn musicAlbum editable" contenteditable="true" th:data-default="${music.album}" th:data-music-album="${music.album}" th:text="${music.album}">앨범</p></td>
+                                <td><button type="button" th:id="urlButton + ${music.musicOrder}" class="btn-videoId-modal btn btn-outline-dark text-center musicVideoId"
                                             data-bs-toggle="modal" data-bs-target="#urlUpdateModal" th:data-video-id="${music.videoId}">수정</button></td>
                             </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="row">
-                        <button type="button" class="btn text-center text-white" onclick="location.href='#'" style="background-color: #5e5e5e;">저장</button>
+                        <!--<button type="button" class="btn text-center text-white" onclick="updatePlaylist()" style="background-color: #5e5e5e;">저장</button>-->
                     </div>
                 </div>
             </div>

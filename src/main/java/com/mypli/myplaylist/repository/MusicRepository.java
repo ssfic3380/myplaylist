@@ -8,7 +8,10 @@ import java.util.List;
 
 public interface MusicRepository extends JpaRepository<Music, Long> {
 
+
     List<Music> findByPlaylistId(Long playlistId);
+
+    List<Music> findByPlaylistIdOrderByMusicOrder(Long playlistId);
 
     List<Music> findByTitle(String title);
 

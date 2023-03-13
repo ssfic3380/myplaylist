@@ -20,12 +20,15 @@ var isEmpty = function(value) {
 };
 
 function loadYoutubeApi() {
+    vId = document.getElementById('music1').dataset.videoId;
+    current = 1;
+    $("#music1").addClass('active');
+    $("#music1").attr('aria-current', 'true');
+
     if (isEmpty(yPlayer) == false) {
         yPlayer.stopVideo();
         yPlayer.destroy();
         yPlayer = null;
-        vId = document.getElementById('music1').dataset.videoId;
-        current = 1;
         onYouTubeIframeAPIReady();
     }
 
