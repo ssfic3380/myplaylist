@@ -88,7 +88,7 @@ public class SecurityConfig {
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                     .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //스프링 시큐리티가 세션을 생성하지도 않고, 기존 것을 사용하지도 않음 (JWT 쓰니까)
                 .and()
                     .csrf().disable() //csrf 토큰 없이 POST 가능
                     .formLogin().disable()
@@ -109,11 +109,11 @@ public class SecurityConfig {
                     //.baseUri("/oauth2/authorization") //클라이언트가 로그인 페이지로 이동하기 위해 사용할 URI (위에 CustomAuthorizationRequestResolver 때문에 주석 처리)
                     .authorizationRequestRepository(authorizationRequestRepository) //사이트 로그인 이후 리다이렉션할 URI를 저장하고 있는 저장소 (?redirect_uri= 의 값을 가지고 있음)
                 .and()
-                    .tokenEndpoint()
-                    .accessTokenResponseClient(customAccessTokenResponseClient()) //토큰 요청, 응답 내용을 재정의
-                .and()
                     .redirectionEndpoint()
                     .baseUri("/*/oauth2/code/*") //클라이언트가 로그인을 성공하면 인가 코드를 받아올 URI
+                .and()
+                    .tokenEndpoint()
+                    .accessTokenResponseClient(customAccessTokenResponseClient()) //토큰 요청, 응답 내용을 재정의
                 .and()
                     .userInfoEndpoint()
                     .oidcUserService(customOidcUserService)

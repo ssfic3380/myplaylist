@@ -70,7 +70,7 @@ public class OAuth2Attributes {
 
     @SuppressWarnings("unchecked")
     private static OAuth2Attributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
-        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response"); //검증되지 않은 연산자(unchecked) 경고 제외(@SuppressWarnings("unchecked"))
         return OAuth2Attributes.builder()
                 .oauthId((String) response.get("id"))
                 .name((String) response.get("name"))

@@ -1,7 +1,6 @@
 package com.mypli.myplaylist.oauth2.handler;
 
 import com.mypli.myplaylist.domain.Member;
-import com.mypli.myplaylist.exception.MemberNotFoundException;
 import com.mypli.myplaylist.oauth2.cookie.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.mypli.myplaylist.oauth2.jwt.JwtToken;
 import com.mypli.myplaylist.oauth2.jwt.JwtTokenProvider;

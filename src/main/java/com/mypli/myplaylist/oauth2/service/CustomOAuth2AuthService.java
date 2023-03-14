@@ -30,7 +30,6 @@ public class CustomOAuth2AuthService implements OAuth2UserService<OAuth2UserRequ
     private final MemberRepository memberRepository;
 
     @Transactional
-    @SneakyThrows
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
 
