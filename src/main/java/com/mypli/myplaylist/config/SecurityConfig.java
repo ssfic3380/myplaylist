@@ -62,7 +62,7 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
-                .antMatchers("/images/**", "/js/**", "/webjars/**", "/favicon.ico", "/h2-console/**")
+                .antMatchers("/css/**", "/img/**", "/js/**", "/webjars/**", "/favicon.ico", "/h2-console/**")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
@@ -99,14 +99,14 @@ public class SecurityConfig {
                 .and()
                     .authorizeRequests()
                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-//                    .antMatchers("/oauth2/**", "/home").permitAll()
-//                    .anyRequest().authenticated()
-                    .anyRequest().permitAll()
+                    .antMatchers("/oauth2/**", "/").permitAll()
+                    .anyRequest().authenticated()
+//                    .anyRequest().permitAll()
                 .and()
                     .oauth2Login()
                     .authorizationEndpoint()
                     .authorizationRequestResolver(new CustomAuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization")) //OAuth2 인증을 요청할 때, 매개 변수 추가(구글 refreshToken을 위함)
-                    //.baseUri("/oauth2/authorization") //클라이언트가 로그인 페이지로 이동하기 위해 사용할 URI
+                    //.baseUri("/oauth2/authorization") //클라이언트가 로그인 페이지로 이동하기 위해 사용할 URI (위에 CustomAuthorizationRequestResolver 때문에 주석 처리)
                     .authorizationRequestRepository(authorizationRequestRepository) //사이트 로그인 이후 리다이렉션할 URI를 저장하고 있는 저장소 (?redirect_uri= 의 값을 가지고 있음)
                 .and()
                     .tokenEndpoint()

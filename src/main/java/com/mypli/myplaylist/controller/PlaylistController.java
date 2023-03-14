@@ -14,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.List;
 
@@ -55,61 +54,6 @@ public class PlaylistController {
     }
 
     /**
-     * 플레이리스트 상세정보 페이지 - 플레이리스트 이름 변경
-     */
-    @PostMapping("/{playlistId}/playlist")
-    public String updatePlaylist(@PathVariable String playlistId, @RequestBody UpdatePlaylistDto updatePlaylistDto,
-                                 Principal principal, RedirectAttributes redirectAttributes) {
-
-        String socialId = "";
-        if (principal == null) return "redirect:/oauth2/login";
-        else socialId = principal.getName();
-
-        playlistService.updateName(socialId, updatePlaylistDto);
-
-        redirectAttributes.addAttribute("playlistId", playlistId);
-
-        return "redirect:/playlist/{playlistId}";
-    }
-
-    /**
-     * 플레이리스트 상세정보 페이지 - 노래 정보 변경
-     */
-    @PostMapping("/{playlistId}/music")
-    public String updateMusic(@PathVariable String playlistId, @RequestBody UpdateMusicDto updateMusicDto,
-                              Principal principal, RedirectAttributes redirectAttributes) {
-
-        String socialId = "";
-        if (principal == null) return "redirect:/oauth2/login";
-        else socialId = principal.getName();
-
-        musicService.update(socialId, updateMusicDto);
-
-        redirectAttributes.addAttribute("playlistId", playlistId);
-
-        return "redirect:/playlist/{playlistId}";
-    }
-
-    /**
-     * 플레이리스트 상세정보 페이지 - 노래 순서 변경
-     */
-    @PostMapping("/{playlistId}/music-order")
-    public String updateMusicOrder(@PathVariable String playlistId, @ModelAttribute UpdateMusicOrderDto updateMusicOrderDto,
-                                   Principal principal, RedirectAttributes redirectAttributes) {
-
-        String socialId = "";
-        if (principal == null) return "redirect:/oauth2/login";
-        else socialId = principal.getName();
-
-        musicService.updateOrder(socialId, updateMusicOrderDto);
-
-        redirectAttributes.addAttribute("playlistId", playlistId);
-
-        return "redirect:/playlist/{playlistId}";
-    }
-
-
-    /**
      * 플레이리스트 상세정보 페이지 - 노래 삭제
      */
     @DeleteMapping("/{musicId}")
@@ -125,6 +69,31 @@ public class PlaylistController {
 
         return "redirect:/playlist/{playlistId}";
     }
+
+    /**
+     * 플레이리스트 상세정보 페이지 - 현재 재생중인 플레이리스트 변경
+     */
+    @GetMapping("/current")
+    public String changePlaylist(@RequestParam Long playlistId, Model model) {
+
+        log.info("{}", playlistId);
+
+        Playlist playlist = playlistService.findById(playlistId);
+
+        PlaylistDto playlistDto = PlaylistDto.builder()
+                .playlistId(playlist.getId())
+                .playlistName(playlist.getPlaylistName())
+                .playlistImg(playlist.getPlaylistImg())
+                .build();
+
+        List<Music> musicList = musicService.findByPlaylistId(playlistDto.getPlaylistId());
+
+        model.addAttribute("playlist", playlistDto);
+        model.addAttribute("musicList", musicList);
+
+        return "fragments/sidebar";
+    }
+
 
     /**
      * 유튜브에서 불러오기 모달 - 유튜브 플레이리스트의 노래를 현재 플레이리스트에 추가
@@ -162,29 +131,5 @@ public class PlaylistController {
         redirectAttributes.addAttribute("playlistId", createMusicDto.getPlaylistId());
 
         return "redirect:/playlist/{playlistId}";
-    }
-
-    /**
-     * 플레이리스트 상세정보 페이지 - 현재 재생중인 플레이리스트 변경
-     */
-    @GetMapping("/current")
-    public String changePlaylist(@RequestParam Long playlistId, Model model) {
-
-        log.info("{}", playlistId);
-
-        Playlist playlist = playlistService.findById(playlistId);
-
-        PlaylistDto playlistDto = PlaylistDto.builder()
-                .playlistId(playlist.getId())
-                .playlistName(playlist.getPlaylistName())
-                .playlistImg(playlist.getPlaylistImg())
-                .build();
-
-        List<Music> musicList = musicService.findByPlaylistId(playlistDto.getPlaylistId());
-
-        model.addAttribute("playlist", playlistDto);
-        model.addAttribute("musicList", musicList);
-
-        return "fragments/sidebar";
     }
 }

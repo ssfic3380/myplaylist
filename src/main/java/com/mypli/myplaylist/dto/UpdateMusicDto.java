@@ -9,12 +9,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class UpdateMusicDto {
 
-    @NotNull
-    private Long playlistId;
-
-    @NotNull
-    private Long musicId;
-
     @Size(max = 128)
     private String title;
 
@@ -30,9 +24,7 @@ public class UpdateMusicDto {
     private Long musicOrder;
 
     @Builder
-    public UpdateMusicDto(Long playlistId, Long musicId, String title, String artist, String album, String videoId, Long musicOrder) {
-        this.playlistId = playlistId;
-        this.musicId = musicId;
+    public UpdateMusicDto(String title, String artist, String album, String videoId, Long musicOrder) {
         this.title = title;
         this.artist = artist;
         this.album = album;

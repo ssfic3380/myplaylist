@@ -133,14 +133,14 @@ public class MusicService {
      * 노래 정보 변경
      */
     @Transactional
-    public Long update(String socialId, UpdateMusicDto updateMusicDto) {
+    public Long update(String socialId, Long playlistId, Long musicId, UpdateMusicDto updateMusicDto) {
         // 1. 권한 체크
         Member member = memberService.findBySocialId(socialId);
-        Playlist playlist = playlistService.findById(updateMusicDto.getPlaylistId());
+        Playlist playlist = playlistService.findById(playlistId);
         checkAuthority(member, playlist);
 
         // 2. 노래 정보 변경
-        Music music = findById(updateMusicDto.getMusicId());
+        Music music = findById(musicId);
 
         music.updateTitle(updateMusicDto.getTitle());
         music.updateArtist(updateMusicDto.getArtist());
@@ -155,10 +155,10 @@ public class MusicService {
      * 노래 순서 변경
      */
     @Transactional
-    public void updateOrder(String socialId, UpdateMusicOrderDto updateMusicOrderDto) {
+    public void updateOrder(String socialId, Long playlistId, UpdateMusicOrderDto updateMusicOrderDto) {
         // 1. 권한 체크
         Member member = memberService.findBySocialId(socialId);
-        Playlist playlist = playlistService.findById(updateMusicOrderDto.getPlaylistId());
+        Playlist playlist = playlistService.findById(playlistId);
         checkAuthority(member, playlist);
 
         // 2. 노래 순서 변경

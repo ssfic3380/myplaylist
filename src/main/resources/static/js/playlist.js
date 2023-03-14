@@ -6,24 +6,24 @@ function setTableDnD() {
             let musicIds = new Array();
             for (let i = 0; i < rows.length; i++) {
                 musicIds.push(rows[i].id);
+                rows[i].firstChild.nextSibling.textContent = (i+1).toString();
             }
 
             let playlistId = $("#playlistId").val();
-            let url = "/playlist/" + playlistId + "/music-order";
+            let url = "/playlist/" + playlistId + "/order";
             let params = {
-                playlistId : playlistId,
                 musicIds : musicIds
             };
 
             $.ajax({
-                type: "POST",
+                type: "PATCH",
                 url: url,
+                contentType:'application/json;charset=UTF-8',
                 headers: {'Authorization': 'Bearer ' + token},
-                data: params,
-                dataType: "text"
+                data: JSON.stringify(params),
+                dataType: "JSON"
             })
                 .done(function (result) {
-                    $("main").replaceWith(result);
                     setTableDnD();
                 })
                 .fail(function (jqXHR) {
@@ -150,22 +150,20 @@ $(function() {
             if ($(this).text() !== $(this).data("default")) {
 
                 console.log("updatePlaylist(): " + token);
-                let url = "/playlist/" + playlistId + "/playlist";
+                let url = "/playlist/" + playlistId;
                 let params = {
-                    playlistId: playlistId,
                     playlistName: $(this).text()
                 }
 
                 $.ajax({
-                    type: "POST",
+                    type: "PATCH",
                     url: url,
+                    contentType:'application/json;charset=UTF-8',
                     headers: {'Authorization': 'Bearer ' + token},
                     data: JSON.stringify(params),
-                    contentType:'application/json;charset=UTF-8',
-                    dataType: "text"
+                    dataType: "JSON"
                 })
                     .done(function (result) {
-                        $("main").replaceWith(result);
                         setTableDnD();
                     })
                     .fail(function (jqXHR) {
@@ -181,10 +179,9 @@ $(function() {
             if ($(this).text() !== $(this).data("default")) {
 
                 console.log("updateMusic(): " + token);
-                let url = "/playlist/" + playlistId + "/music";
+                let musicId = $(this).parents("tr").data("music-id")
+                let url = "/playlist/" + playlistId + "/" + musicId;
                 let params = {
-                    playlistId : playlistId,
-                    musicId : $(this).parents("tr").data("music-id"),
                     title : $(this).parents("tr").children().children(".musicTitle").text(),
                     artist : $(this).parents("tr").children().children(".musicArtist").text(),
                     album : $(this).parents("tr").children().children(".musicAlbum").text(),
@@ -193,15 +190,14 @@ $(function() {
                 }
 
                 $.ajax({
-                    type: "POST",
+                    type: "PATCH",
                     url: url,
+                    contentType:'application/json;charset=UTF-8',
                     headers: {'Authorization': 'Bearer ' + token},
                     data: JSON.stringify(params),
-                    contentType:'application/json;charset=UTF-8',
-                    dataType: "text"
+                    dataType: "JSON"
                 })
                     .done(function (result) {
-                        $("main").replaceWith(result);
                         setTableDnD();
                     })
                     .fail(function (jqXHR) {

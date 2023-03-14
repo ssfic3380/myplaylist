@@ -3,10 +3,8 @@ package com.mypli.myplaylist.service;
 import com.mypli.myplaylist.domain.Member;
 import com.mypli.myplaylist.domain.Music;
 import com.mypli.myplaylist.domain.Playlist;
-import com.mypli.myplaylist.dto.CreateMusicDto;
-import com.mypli.myplaylist.dto.MusicDto;
 import com.mypli.myplaylist.dto.PlaylistDto;
-import com.mypli.myplaylist.dto.UpdatePlaylistDto;
+import com.mypli.myplaylist.dto.UpdatePlaylistNameDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistDto;
 import com.mypli.myplaylist.dto.youtube.YoutubePlaylistItemDto;
 import com.mypli.myplaylist.exception.NoPermissionException;
@@ -122,15 +120,15 @@ public class PlaylistService {
      * 플레이리스트 이름 변경
      */
     @Transactional
-    public Long updateName(String socialId, UpdatePlaylistDto updatePlaylistDto) {
+    public Long updateName(String socialId, Long playlistId, UpdatePlaylistNameDto updatePlaylistNameDto) {
         // 1. 권한 체크
         Member member = memberService.findBySocialId(socialId);
-        Playlist playlist = findById(updatePlaylistDto.getPlaylistId());
+        Playlist playlist = findById(playlistId);
         checkAuthority(member, playlist);
         
         // 2. 플레이리스트 이름 변경
-        playlist.updatePlaylistName(updatePlaylistDto.getPlaylistName());
-        log.info("Playlist updateName: {}", updatePlaylistDto.getPlaylistName());
+        playlist.updatePlaylistName(updatePlaylistNameDto.getPlaylistName());
+        log.info("Playlist updateName: {}", updatePlaylistNameDto.getPlaylistName());
 
         return playlist.getId();
     }

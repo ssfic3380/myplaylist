@@ -10,17 +10,13 @@ import javax.validation.constraints.Size;
 
 @Getter @Setter
 @NoArgsConstructor
-public class UpdatePlaylistDto {
-
-    @NotNull
-    private Long playlistId;
+public class UpdatePlaylistNameDto {
 
     @NotNull @Size(max = 128)
     private String playlistName;
 
     @Builder
-    public UpdatePlaylistDto(Long playlistId, String playlistName) {
-        this.playlistId = playlistId;
+    public UpdatePlaylistNameDto(String playlistName) {
         this.playlistName = playlistName;
     }
 }

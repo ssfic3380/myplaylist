@@ -11,6 +11,8 @@ import java.util.Map;
 public class ApiResponse<T> {
 
     private final static int SUCCESS = 200;
+    private final static int CREATED = 201;
+    private final static int NO_CONTENT = 204;
     private final static int BAD_REQUEST = 400;
     private final static int UNAUTHORIZED = 401;
     private final static int FORBIDDEN = 403;
@@ -39,6 +41,17 @@ public class ApiResponse<T> {
         map.put(name, body);
 
         return new ApiResponse(new ApiResponseHeader(SUCCESS, SUCCESS_MESSAGE), map);
+    }
+
+    public static <T> ApiResponse<T> created(String name, T body) {
+        Map<String, T> map = new HashMap<>();
+        map.put(name, body);
+
+        return new ApiResponse(new ApiResponseHeader(CREATED, SUCCESS_MESSAGE), map);
+    }
+
+    public static <T> ApiResponse<T> noContent() {
+        return new ApiResponse(new ApiResponseHeader(NO_CONTENT, SUCCESS_MESSAGE), null);
     }
 
     public static <T> ApiResponse<T> badRequest() {

@@ -41,7 +41,7 @@ public class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRe
     private OAuth2AuthorizationRequest customAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest) {
         Map<String, Object> additionalParameters = new LinkedHashMap<>(authorizationRequest.getAdditionalParameters());
         additionalParameters.put("access_type", "offline");
-        additionalParameters.put("prompt", "consent"); //매 로그인마다 사용자에게 동의를 요청 (개발 환경에서만 사용, 이게 없으면 access_type이 offline이어도 구글에서 refreshToken을 주지 않음)
+        //additionalParameters.put("prompt", "consent"); //앱 재승인 요청 (개발 환경에서만 사용, refresh_token을 안 주는 아이디들이 있으면 이걸로 재승인 받아야 함)
 
         return OAuth2AuthorizationRequest.from(authorizationRequest)
                 .additionalParameters(additionalParameters)

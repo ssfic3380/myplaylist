@@ -12,14 +12,10 @@ import javax.validation.constraints.NotNull;
 public class UpdateMusicOrderDto {
 
     @NotNull
-    private Long playlistId;
-
-    @NotNull
     private Long[] musicIds;
 
     @Builder
-    public UpdateMusicOrderDto(Long playlistId, Long[] musicIds) {
-        this.playlistId = playlistId;
+    public UpdateMusicOrderDto(Long[] musicIds) {
         this.musicIds = musicIds;
     }
 }
